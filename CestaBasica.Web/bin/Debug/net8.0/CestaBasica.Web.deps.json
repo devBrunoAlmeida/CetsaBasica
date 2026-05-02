@@ -1,0 +1,36 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v8.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v8.0": {
+      "CestaBasica.Web/1.0.0": {
+        "dependencies": {
+          "CestaBasica.Shared": "1.0.0"
+        },
+        "runtime": {
+          "CestaBasica.Web.dll": {}
+        }
+      },
+      "CestaBasica.Shared/1.0.0": {
+        "runtime": {
+          "CestaBasica.Shared.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "CestaBasica.Web/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "CestaBasica.Shared/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

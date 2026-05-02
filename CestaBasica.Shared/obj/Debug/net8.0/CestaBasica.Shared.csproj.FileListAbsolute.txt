@@ -1,0 +1,11 @@
+/home/bruno/Área de trabalho/Fatec/projectCestaBasica/CestaBasica.Shared/bin/Debug/net8.0/CestaBasica.Shared.deps.json
+/home/bruno/Área de trabalho/Fatec/projectCestaBasica/CestaBasica.Shared/bin/Debug/net8.0/CestaBasica.Shared.dll
+/home/bruno/Área de trabalho/Fatec/projectCestaBasica/CestaBasica.Shared/bin/Debug/net8.0/CestaBasica.Shared.pdb
+/home/bruno/Área de trabalho/Fatec/projectCestaBasica/CestaBasica.Shared/obj/Debug/net8.0/CestaBasica.Shared.GeneratedMSBuildEditorConfig.editorconfig
+/home/bruno/Área de trabalho/Fatec/projectCestaBasica/CestaBasica.Shared/obj/Debug/net8.0/CestaBasica.Shared.AssemblyInfoInputs.cache
+/home/bruno/Área de trabalho/Fatec/projectCestaBasica/CestaBasica.Shared/obj/Debug/net8.0/CestaBasica.Shared.AssemblyInfo.cs
+/home/bruno/Área de trabalho/Fatec/projectCestaBasica/CestaBasica.Shared/obj/Debug/net8.0/CestaBasica.Shared.csproj.CoreCompileInputs.cache
+/home/bruno/Área de trabalho/Fatec/projectCestaBasica/CestaBasica.Shared/obj/Debug/net8.0/CestaBasica.Shared.dll
+/home/bruno/Área de trabalho/Fatec/projectCestaBasica/CestaBasica.Shared/obj/Debug/net8.0/refint/CestaBasica.Shared.dll
+/home/bruno/Área de trabalho/Fatec/projectCestaBasica/CestaBasica.Shared/obj/Debug/net8.0/CestaBasica.Shared.pdb
+/home/bruno/Área de trabalho/Fatec/projectCestaBasica/CestaBasica.Shared/obj/Debug/net8.0/ref/CestaBasica.Shared.dll
