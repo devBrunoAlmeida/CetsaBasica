@@ -13,4 +13,5 @@ public class AppDbContext : DbContext
     public DbSet<Cesta> Cestas { get; set; }
     public DbSet<Retirada> Retiradas { get; set; }
     public DbSet<Notificacao> Notificacoes { get; set; }
+    public DbSet<Usuario> Usuarios { get; set; }
 }
