@@ -16,7 +16,9 @@ builder.Services.AddSwaggerGen();
 
 #region Configurações de banco
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql("Host=localhost;Port=5433;Database=CestaBasicaDb;Username=postgres;Password=38476asdfu2"));
+    options.UseNpgsql(
+        builder.Configuration.GetConnectionString("DefaultConnection")
+    ));
 #endregion
 
 #region Repositories
