@@ -9,3 +9,4 @@
 /home/bruno/Área de trabalho/Fatec/projectCestaBasica/CestaBasica.Shared/obj/Debug/net8.0/refint/CestaBasica.Shared.dll
 /home/bruno/Área de trabalho/Fatec/projectCestaBasica/CestaBasica.Shared/obj/Debug/net8.0/CestaBasica.Shared.pdb
 /home/bruno/Área de trabalho/Fatec/projectCestaBasica/CestaBasica.Shared/obj/Debug/net8.0/ref/CestaBasica.Shared.dll
+/home/bruno/Área de trabalho/Fatec/projectCestaBasica/CestaBasica.Shared/obj/Debug/net8.0/CestaBasica.Shared.sourcelink.json
