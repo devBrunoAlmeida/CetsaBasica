@@ -35,6 +35,7 @@ builder.Services.AddScoped<RetiradaApplication>();
 builder.Services.AddScoped<CestaApplication>();
 builder.Services.AddScoped<NotificacaoApplication>();
 builder.Services.AddScoped<DashboardApplication>();
+builder.Services.AddScoped<ImportacaoApplication>();
 #endregion
 
 #region Services
@@ -43,6 +44,7 @@ builder.Services.AddScoped<RetiradaService>();
 builder.Services.AddScoped<CestaService>();
 builder.Services.AddScoped<NotificacaoService>();
 builder.Services.AddScoped<DashboardService>();
+builder.Services.AddScoped<ImportacaoService>();
 #endregion
 
 var app = builder.Build();

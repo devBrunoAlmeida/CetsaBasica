@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("CestaBasica.Web")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fca18c057bd39a7d29ecf49c501483398d1064cf")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a87f9bd7c682d25758d130e4eb957375f50ef15f")]
 [assembly: System.Reflection.AssemblyProductAttribute("CestaBasica.Web")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CestaBasica.Web")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
