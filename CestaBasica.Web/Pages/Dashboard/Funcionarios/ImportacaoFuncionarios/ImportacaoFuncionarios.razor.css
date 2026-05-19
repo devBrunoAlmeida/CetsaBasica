@@ -1,0 +1,272 @@
+.import-page {
+    min-height: 100vh;
+    background: #f4f7fb;
+    padding: 32px;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.page-header,
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.page-header h1,
+.card-header h2 {
+    color: #002b6b;
+    font-weight: 800;
+}
+
+.page-header p,
+.card-header span {
+    color: #64748b;
+}
+
+.upload-card,
+.preview-card,
+.history-card {
+    background: #ffffff;
+    border-radius: 26px;
+    padding: 28px;
+    box-shadow: 0 12px 30px rgba(0, 43, 107, 0.08);
+    margin-bottom: 24px;
+}
+
+.upload-area {
+    border: 2px dashed #9ec5fe;
+    border-radius: 24px;
+    padding: 48px;
+    text-align: center;
+    background: linear-gradient(180deg, #f8fbff, #ffffff);
+}
+
+.upload-icon {
+    width: 86px;
+    height: 86px;
+    border-radius: 24px;
+    background: #edf4ff;
+    color: #005be0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 42px;
+    margin: 0 auto 20px;
+}
+
+.upload-area h2 {
+    color: #002b6b;
+    font-weight: 800;
+}
+
+.upload-area p {
+    color: #64748b;
+}
+
+.btn-upload,
+.btn-primary,
+.btn-secondary {
+    height: 46px;
+    border-radius: 14px;
+    padding: 0 22px;
+    border: none;
+    font-weight: 800;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-upload input {
+    display: none;
+}
+
+.btn-upload,
+.btn-primary {
+    background: linear-gradient(90deg, #004bbd, #006dff);
+    color: white;
+    margin-top: 16px;
+}
+
+.btn-secondary {
+    background: #edf4ff;
+    color: #003b95;
+}
+
+.file-selected {
+    margin-top: 18px;
+    color: #003b95;
+    font-weight: 600;
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+    margin-bottom: 24px;
+}
+
+.summary-card {
+    background: white;
+    border-radius: 22px;
+    padding: 24px;
+    box-shadow: 0 12px 30px rgba(0, 43, 107, 0.08);
+}
+
+.summary-card span {
+    color: #64748b;
+    font-weight: 700;
+}
+
+.summary-card h2 {
+    margin-top: 8px;
+    font-size: 34px;
+    font-weight: 800;
+}
+
+.summary-card.success h2 {
+    color: #168a45;
+}
+
+.summary-card.danger h2 {
+    color: #dc2626;
+}
+
+.summary-card.neutral h2 {
+    color: #002b6b;
+}
+
+.progress-area {
+    margin-bottom: 24px;
+}
+
+.progress-info {
+    display: flex;
+    justify-content: space-between;
+    color: #002b6b;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.progress-bar {
+    height: 14px;
+    background: #edf4ff;
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.progress-bar div {
+    height: 100%;
+    background: linear-gradient(90deg, #004bbd, #006dff);
+    border-radius: 999px;
+    transition: 0.3s;
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    min-width: 1050px;
+    border-collapse: collapse;
+}
+
+thead {
+    background: #f4f7fb;
+}
+
+th {
+    text-align: left;
+    padding: 16px;
+    color: #002b6b;
+    font-size: 14px;
+}
+
+td {
+    padding: 16px;
+    border-bottom: 1px solid #edf2f7;
+    color: #334155;
+}
+
+.invalid-row {
+    background: #fff7f7;
+}
+
+.badge {
+    padding: 8px 13px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.badge.success {
+    background: #e9f9ef;
+    color: #168a45;
+}
+
+.badge.danger {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.history-item {
+    display: flex;
+    justify-content: space-between;
+    gap: 18px;
+    align-items: center;
+    background: #f8fbff;
+    border-radius: 18px;
+    padding: 18px;
+}
+
+.history-item strong {
+    color: #002b6b;
+}
+
+.history-item p {
+    margin: 4px 0 0;
+    color: #64748b;
+}
+
+.history-item span {
+    background: #edf4ff;
+    color: #003b95;
+    padding: 9px 13px;
+    border-radius: 999px;
+    font-weight: 800;
+}
+
+@media (max-width: 900px) {
+    .page-header,
+    .card-header,
+    .history-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .upload-area {
+        padding: 30px 20px;
+    }
+
+    .import-page {
+        padding: 20px;
+    }
+
+    .btn-secondary,
+    .btn-primary {
+        width: 100%;
+    }
+}

@@ -1,0 +1,213 @@
+@page "/dashboard"
+@using Microsoft.AspNetCore.Components.Routing
+
+<div class="dashboard-page">
+
+    <aside class="sidebar @(menuAberto ? "" : "collapsed")">
+        <div class="sidebar-header">
+            <div class="logo">🧺</div>
+            @if (menuAberto)
+            {
+                <span>Gestão Social</span>
+            }
+        </div>
+
+        <button class="toggle-btn" @onclick="AlternarMenu">
+            ☰
+        </button>
+
+        <nav>
+
+            <NavLink href="/dashboard" Match="NavLinkMatch.All">
+                <span>📊 Dashboard</span>
+            </NavLink>
+
+            <NavLink href="/funcionarios">
+                <span>👥 Funcionários</span>
+            </NavLink>
+
+            <NavLink href="/retiradas">
+                <span>📦 Retiradas</span>
+            </NavLink>
+
+            <NavLink href="/notificacoes">
+                <span>🔔 Notificações</span>
+            </NavLink>
+
+            <NavLink href="/usuarios">
+                <span>🛡️ Usuários</span>
+            </NavLink>
+
+            <NavLink href="/configuracoes">
+                <span>⚙️ Configurações</span>
+            </NavLink>
+
+        </nav>
+    </aside>
+
+    <main class="dashboard-content">
+
+        <header class="topbar">
+            <div>
+                <h1>Dashboard Administrativo</h1>
+                <p>Visão gerencial dos programas de distribuição de benefícios.</p>
+            </div>
+
+            <div class="filters">
+                <input type="date" />
+                <input type="date" />
+                <button>Filtrar</button>
+            </div>
+        </header>
+
+        <section class="cards-grid">
+
+            <div class="card-stat">
+                <div>
+                    <span>Total de Funcionários</span>
+                    <h2>1.248</h2>
+                </div>
+                <div class="card-icon blue">👥</div>
+            </div>
+
+            <div class="card-stat">
+                <div>
+                    <span>Total de Retiradas</span>
+                    <h2>856</h2>
+                </div>
+                <div class="card-icon green">📦</div>
+            </div>
+
+            <div class="card-stat">
+                <div>
+                    <span>Total Pendentes</span>
+                    <h2>132</h2>
+                </div>
+                <div class="card-icon yellow">⏳</div>
+            </div>
+
+            <div class="card-stat">
+                <div>
+                    <span>Notificações Enviadas</span>
+                    <h2>2.430</h2>
+                </div>
+                <div class="card-icon purple">🔔</div>
+            </div>
+
+        </section>
+
+        <section class="charts-grid">
+
+            <div class="panel">
+                <div class="panel-header">
+                    <h3>Evolução de Retiradas</h3>
+                    <span>Últimos 6 meses</span>
+                </div>
+
+                <div class="bar-chart">
+                    <div style="height:45%"><span>Jan</span></div>
+                    <div style="height:65%"><span>Fev</span></div>
+                    <div style="height:55%"><span>Mar</span></div>
+                    <div style="height:80%"><span>Abr</span></div>
+                    <div style="height:70%"><span>Mai</span></div>
+                    <div style="height:90%"><span>Jun</span></div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-header">
+                    <h3>Distribuição por Setor</h3>
+                    <span>Secretarias</span>
+                </div>
+
+                <div class="sector-list">
+                    <div><span>Assistência Social</span><strong>42%</strong></div>
+                    <div><span>Educação</span><strong>28%</strong></div>
+                    <div><span>Saúde</span><strong>18%</strong></div>
+                    <div><span>Administração</span><strong>12%</strong></div>
+                </div>
+            </div>
+
+        </section>
+
+        <section class="bottom-grid">
+
+            <div class="panel">
+                <div class="panel-header">
+                    <h3>Últimas Retiradas</h3>
+                    <span>Resumo operacional</span>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Funcionário</th>
+                            <th>Setor</th>
+                            <th>Data</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr>
+                            <td>Maria Oliveira</td>
+                            <td>Educação</td>
+                            <td>16/05/2026</td>
+                            <td><span class="badge success">Retirada</span></td>
+                        </tr>
+
+                        <tr>
+                            <td>João Santos</td>
+                            <td>Saúde</td>
+                            <td>16/05/2026</td>
+                            <td><span class="badge warning">Pendente</span></td>
+                        </tr>
+
+                        <tr>
+                            <td>Ana Lima</td>
+                            <td>Assistência Social</td>
+                            <td>15/05/2026</td>
+                            <td><span class="badge success">Retirada</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="panel">
+                <div class="panel-header">
+                    <h3>Notificações Recentes</h3>
+                    <span>Comunicações enviadas</span>
+                </div>
+
+                <div class="notification-list">
+                    <div>
+                        <strong>Convocação enviada</strong>
+                        <p>Funcionários pendentes foram notificados.</p>
+                    </div>
+
+                    <div>
+                        <strong>Nova retirada registrada</strong>
+                        <p>Benefício confirmado com sucesso.</p>
+                    </div>
+
+                    <div>
+                        <strong>Relatório atualizado</strong>
+                        <p>Dados consolidados do período atual.</p>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+@code {
+    private bool menuAberto = true;
+
+    private void AlternarMenu()
+    {
+        menuAberto = !menuAberto;
+    }
+}

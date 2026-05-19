@@ -1,0 +1,148 @@
+@page "/funcionarios"
+
+<div class="employees-page">
+
+    <div class="page-header">
+         <div>
+            <a href="/dashboard" class="btn-back">
+                ← Voltar
+            </a>
+        </div>
+        <div>
+            <h1>Gerenciamento de Funcionários</h1>
+            <p>Controle administrativo de beneficiários, retiradas e histórico operacional.</p>
+        </div>
+
+        <button class="btn-primary" href="/dashboard/funcionarios/novo">+ Novo funcionário</button>
+        <button class="btn-primary" href="/dashboard/funcionarios/importacao">+ Importar funcionários</button>
+
+    </div>
+
+    <section class="filters-card">
+        <div class="search-box">
+            <label>Busca rápida</label>
+            <input placeholder="Pesquisar por nome, matrícula ou código de barras..." />
+        </div>
+
+        <div class="filter-group">
+            <div>
+                <label>Status</label>
+                <select>
+                    <option>Todos</option>
+                    <option>Retirado</option>
+                    <option>Pendente</option>
+                </select>
+            </div>
+
+            <div>
+                <label>Secretaria/Setor</label>
+                <select>
+                    <option>Todos</option>
+                    <option>Assistência Social</option>
+                    <option>Educação</option>
+                    <option>Saúde</option>
+                    <option>Administração</option>
+                </select>
+            </div>
+
+            <div>
+                <label>Data inicial</label>
+                <input type="date" />
+            </div>
+
+            <div>
+                <label>Data final</label>
+                <input type="date" />
+            </div>
+        </div>
+    </section>
+
+    <section class="table-card">
+        <div class="table-header">
+            <div>
+                <h2>Funcionários cadastrados</h2>
+                <span>Lista consolidada de registros ativos no sistema.</span>
+            </div>
+
+            <button class="btn-secondary">Exportar</button>
+        </div>
+
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Matrícula</th>
+                        <th>Código de barras</th>
+                        <th>Telefone</th>
+                        <th>Secretaria/Setor</th>
+                        <th>Status de retirada</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var funcionario in funcionarios)
+                    {
+                        <tr>
+                            <td>
+                                <strong>@funcionario.Nome</strong>
+                                <small>@funcionario.Email</small>
+                            </td>
+                            <td>@funcionario.Matricula</td>
+                            <td>@funcionario.CodigoBarras</td>
+                            <td>@funcionario.Telefone</td>
+                            <td>@funcionario.Setor</td>
+                            <td>
+                                <span class="badge @(funcionario.Status == "Retirado" ? "success" : "warning")">
+                                    @funcionario.Status
+                                </span>
+                            </td>
+                            <td>
+                                <div class="actions">
+                                    <button title="Editar">✏️</button>
+                                    <button title="Excluir">🗑️</button>
+                                    <button title="Visualizar histórico">📄</button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="pagination">
+            <span>Exibindo 1-5 de 128 registros</span>
+
+            <div>
+                <button>Anterior</button>
+                <button class="active">1</button>
+                <button>2</button>
+                <button>3</button>
+                <button>Próxima</button>
+            </div>
+        </div>
+    </section>
+
+</div>
+
+@code {
+    private List<FuncionarioViewModel> funcionarios = new()
+    {
+        new("Maria Oliveira", "maria.oliveira@email.com", "MAT-00124", "7894561230001", "(15) 99999-1001", "Educação", "Retirado"),
+        new("João Santos", "joao.santos@email.com", "MAT-00125", "7894561230002", "(15) 99999-1002", "Saúde", "Pendente"),
+        new("Ana Lima", "ana.lima@email.com", "MAT-00126", "7894561230003", "(15) 99999-1003", "Assistência Social", "Retirado"),
+        new("Carlos Pereira", "carlos.pereira@email.com", "MAT-00127", "7894561230004", "(15) 99999-1004", "Administração", "Pendente"),
+        new("Fernanda Rocha", "fernanda.rocha@email.com", "MAT-00128", "7894561230005", "(15) 99999-1005", "Educação", "Retirado")
+    };
+
+    public record FuncionarioViewModel(
+        string Nome,
+        string Email,
+        string Matricula,
+        string CodigoBarras,
+        string Telefone,
+        string Setor,
+        string Status
+    );
+}

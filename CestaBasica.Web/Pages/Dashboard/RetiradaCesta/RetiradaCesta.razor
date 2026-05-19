@@ -1,0 +1,257 @@
+@page "/retiradas"
+
+<div class="withdraw-page">
+
+    <div class="page-header">
+         <div>
+            <a href="/dashboard" class="btn-back">
+                ← Voltar
+            </a>
+        </div>
+        <div>
+            <h1>Registro de Retirada</h1>
+            <p>Registre a entrega de cestas básicas por código de barras ou busca manual.</p>
+        </div>
+    </div>
+
+    <section class="content-grid">
+
+        <div class="panel">
+            <div class="panel-header">
+                <h2>Identificação do Funcionário</h2>
+                <span>Informe o código de barras ou pesquise manualmente.</span>
+            </div>
+
+            <div class="form-group">
+                <label>Código de barras</label>
+                <input class="input-custom"
+                       placeholder="Leia ou digite o código de barras"
+                       @bind="codigoBarras"
+                       @oninput="BuscarPorCodigo" />
+            </div>
+
+            <div class="divider">
+                <span>ou</span>
+            </div>
+
+            <div class="form-group">
+                <label>Busca manual</label>
+                <input class="input-custom"
+                       placeholder="Pesquisar por nome ou matrícula"
+                       @bind="buscaManual"
+                       @oninput="BuscarManual" />
+            </div>
+
+            <div class="search-results">
+                @foreach (var item in resultadosBusca)
+                {
+                    <button @onclick="() => SelecionarFuncionario(item)">
+                        <strong>@item.Nome</strong>
+                        <span>@item.Matricula • @item.Setor</span>
+                    </button>
+                }
+            </div>
+        </div>
+
+        <div class="panel employee-card">
+            <div class="panel-header">
+                <h2>Dados do Funcionário</h2>
+                <span>Informações carregadas automaticamente.</span>
+            </div>
+
+            @if (funcionarioSelecionado is not null)
+            {
+                <div class="employee-info">
+                    <div class="avatar">
+                        @funcionarioSelecionado.Nome[..1]
+                    </div>
+
+                    <div>
+                        <h3>@funcionarioSelecionado.Nome</h3>
+                        <p>@funcionarioSelecionado.Setor</p>
+                    </div>
+                </div>
+
+                <div class="details-grid">
+                    <div>
+                        <span>Matrícula</span>
+                        <strong>@funcionarioSelecionado.Matricula</strong>
+                    </div>
+
+                    <div>
+                        <span>Código de barras</span>
+                        <strong>@funcionarioSelecionado.CodigoBarras</strong>
+                    </div>
+
+                    <div>
+                        <span>Telefone</span>
+                        <strong>@funcionarioSelecionado.Telefone</strong>
+                    </div>
+
+                    <div>
+                        <span>Status atual</span>
+                        <strong class="status">@funcionarioSelecionado.Status</strong>
+                    </div>
+                </div>
+
+                <div class="date-box">
+                    <span>Data e hora do registro</span>
+                    <strong>@DateTime.Now.ToString("dd/MM/yyyy HH:mm")</strong>
+                </div>
+
+                <button class="btn-confirm" @onclick="ConfirmarRetirada">
+                    Confirmar retirada
+                </button>
+            }
+            else
+            {
+                <div class="empty-state">
+                    <div>🔎</div>
+                    <h3>Nenhum funcionário selecionado</h3>
+                    <p>Faça a leitura do código de barras ou utilize a busca manual.</p>
+                </div>
+            }
+        </div>
+
+    </section>
+
+    @if (retiradaConfirmada)
+    {
+        <div class="success-alert">
+            ✅ Retirada registrada com sucesso para <strong>@ultimoFuncionario</strong>.
+        </div>
+    }
+
+    <section class="history-panel">
+        <div class="panel-header">
+            <h2>Histórico recente de retiradas</h2>
+            <span>Últimas entregas registradas no sistema.</span>
+        </div>
+
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Funcionário</th>
+                        <th>Matrícula</th>
+                        <th>Setor</th>
+                        <th>Data/Hora</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var item in historico)
+                    {
+                        <tr>
+                            <td>@item.Nome</td>
+                            <td>@item.Matricula</td>
+                            <td>@item.Setor</td>
+                            <td>@item.DataHora</td>
+                            <td><span class="badge">Retirado</span></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+</div>
+
+@code {
+    private string codigoBarras = "";
+    private string buscaManual = "";
+    private bool retiradaConfirmada = false;
+    private string ultimoFuncionario = "";
+
+    private FuncionarioRetirada? funcionarioSelecionado;
+
+    private List<FuncionarioRetirada> funcionarios = new()
+    {
+        new("Maria Oliveira", "MAT-001", "789456123001", "(15) 99999-1001", "Educação", "Pendente"),
+        new("João Santos", "MAT-002", "789456123002", "(15) 99999-1002", "Saúde", "Pendente"),
+        new("Ana Lima", "MAT-003", "789456123003", "(15) 99999-1003", "Assistência Social", "Pendente")
+    };
+
+    private List<FuncionarioRetirada> resultadosBusca = new();
+
+    private List<HistoricoRetirada> historico = new()
+    {
+        new("Carlos Pereira", "MAT-010", "Administração", "16/05/2026 09:20"),
+        new("Fernanda Rocha", "MAT-011", "Educação", "16/05/2026 08:45")
+    };
+
+    private void BuscarPorCodigo(ChangeEventArgs e)
+    {
+        codigoBarras = e.Value?.ToString() ?? "";
+
+        funcionarioSelecionado = funcionarios
+            .FirstOrDefault(x => x.CodigoBarras == codigoBarras);
+
+        retiradaConfirmada = false;
+    }
+
+    private void BuscarManual(ChangeEventArgs e)
+    {
+        buscaManual = e.Value?.ToString() ?? "";
+
+        resultadosBusca = funcionarios
+            .Where(x =>
+                x.Nome.Contains(buscaManual, StringComparison.OrdinalIgnoreCase) ||
+                x.Matricula.Contains(buscaManual, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+    }
+
+    private void SelecionarFuncionario(FuncionarioRetirada funcionario)
+    {
+        funcionarioSelecionado = funcionario;
+        resultadosBusca.Clear();
+        buscaManual = funcionario.Nome;
+        retiradaConfirmada = false;
+    }
+
+    private void ConfirmarRetirada()
+    {
+        if (funcionarioSelecionado is null)
+            return;
+
+        ultimoFuncionario = funcionarioSelecionado.Nome;
+        funcionarioSelecionado.Status = "Retirado";
+
+        historico.Insert(0, new HistoricoRetirada(
+            funcionarioSelecionado.Nome,
+            funcionarioSelecionado.Matricula,
+            funcionarioSelecionado.Setor,
+            DateTime.Now.ToString("dd/MM/yyyy HH:mm")
+        ));
+
+        retiradaConfirmada = true;
+    }
+
+    public class FuncionarioRetirada
+    {
+        public FuncionarioRetirada(string nome, string matricula, string codigoBarras, string telefone, string setor, string status)
+        {
+            Nome = nome;
+            Matricula = matricula;
+            CodigoBarras = codigoBarras;
+            Telefone = telefone;
+            Setor = setor;
+            Status = status;
+        }
+
+        public string Nome { get; set; }
+        public string Matricula { get; set; }
+        public string CodigoBarras { get; set; }
+        public string Telefone { get; set; }
+        public string Setor { get; set; }
+        public string Status { get; set; }
+    }
+
+    public record HistoricoRetirada(
+        string Nome,
+        string Matricula,
+        string Setor,
+        string DataHora
+    );
+}

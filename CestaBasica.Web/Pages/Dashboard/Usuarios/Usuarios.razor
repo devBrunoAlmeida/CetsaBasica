@@ -1,0 +1,321 @@
+@page "/usuarios"
+@using Microsoft.AspNetCore.Components.Routing
+
+
+<div class="users-page">
+
+    <div class="page-header">
+        <div>
+            <a href="/dashboard" class="btn-back">
+                ← Voltar
+            </a>
+        </div>
+
+        <div class="header-left">
+            <div>
+                <h1>Administração de Usuários</h1>
+                <p>
+                  Gerencie acessos, perfis e permissões dos usuários do sistema.
+                </p>
+            </div>
+
+        </div>
+        <a href="/novo" class="btn-primary" >
+            + Novo usuário
+        </a>
+    </div>
+
+    <section class="filters-card">
+        <div class="search-box">
+            <label>Busca dinâmica</label>
+            <input placeholder="Pesquisar por nome, e-mail ou perfil..."
+                   @bind="busca"
+                   @bind:event="oninput" />
+        </div>
+    </section>
+
+    @if (exibirFormulario)
+    {
+        <section class="form-card">
+            <div class="card-header">
+                <div>
+                    <h2>@(editando ? "Editar usuário" : "Cadastrar novo usuário")</h2>
+                    <span>Defina os dados de acesso e permissões administrativas.</span>
+                </div>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Nome completo</label>
+                    <input @bind="usuarioForm.Nome" placeholder="Digite o nome do usuário" />
+                </div>
+
+                <div class="form-group">
+                    <label>E-mail</label>
+                    <input @bind="usuarioForm.Email" placeholder="usuario@empresa.com.br" />
+                </div>
+
+                <div class="form-group">
+                    <label>Perfil</label>
+                    <select @bind="usuarioForm.Perfil">
+                        <option>Administrador</option>
+                        <option>Operador</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Status</label>
+                    <select @bind="usuarioForm.Ativo">
+                        <option value="true">Ativo</option>
+                        <option value="false">Inativo</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="permissions-box">
+                <h3>Controle de permissões</h3>
+
+                <div class="permissions-grid">
+                    <label><input type="checkbox" @bind="usuarioForm.Permissoes.Funcionarios" /> Funcionários</label>
+                    <label><input type="checkbox" @bind="usuarioForm.Permissoes.Retiradas" /> Retiradas</label>
+                    <label><input type="checkbox" @bind="usuarioForm.Permissoes.Notificacoes" /> Notificações</label>
+                    <label><input type="checkbox" @bind="usuarioForm.Permissoes.Relatorios" /> Relatórios</label>
+                    <label><input type="checkbox" @bind="usuarioForm.Permissoes.Usuarios" /> Usuários</label>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button class="btn-secondary" @onclick="Cancelar">Cancelar</button>
+                <button class="btn-primary" @onclick="SalvarUsuario">Salvar usuário</button>
+            </div>
+        </section>
+    }
+
+    <section class="table-card">
+        <div class="table-header">
+            <div>
+                <h2>Usuários cadastrados</h2>
+                <span>Listagem de usuários autorizados na plataforma.</span>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Usuário</th>
+                        <th>E-mail</th>
+                        <th>Perfil</th>
+                        <th>Status</th>
+                        <th>Permissões</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var usuario in UsuariosFiltrados)
+                    {
+                        <tr>
+                            <td>
+                                <strong>@usuario.Nome</strong>
+                                <small>ID: @usuario.Id</small>
+                            </td>
+
+                            <td>@usuario.Email</td>
+
+                            <td>
+                                <span class="profile-badge @(usuario.Perfil == "Administrador" ? "admin" : "operator")">
+                                    @usuario.Perfil
+                                </span>
+                            </td>
+
+                            <td>
+                                <span class="status-badge @(usuario.Ativo ? "active" : "inactive")">
+                                    @(usuario.Ativo ? "Ativo" : "Inativo")
+                                </span>
+                            </td>
+
+                            <td>
+                                <div class="permissions-tags">
+                                    @foreach (var permissao in usuario.Permissoes.ListarAtivas())
+                                    {
+                                        <span>@permissao</span>
+                                    }
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="actions">
+                                    <button title="Editar" @onclick="() => EditarUsuario(usuario)">✏️</button>
+                                    <button title="Excluir" @onclick="() => ExcluirUsuario(usuario.Id)">🗑️</button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+</div>
+
+@code {
+    private string busca = "";
+    private bool exibirFormulario = false;
+    private bool editando = false;
+
+    private UsuarioViewModel usuarioForm = new();
+
+    private List<UsuarioViewModel> usuarios = new()
+    {
+        new()
+        {
+            Id = 1,
+            Nome = "Administrador Geral",
+            Email = "admin@empresa.com.br",
+            Perfil = "Administrador",
+            Ativo = true,
+            Permissoes = new PermissoesUsuario
+            {
+                Funcionarios = true,
+                Retiradas = true,
+                Notificacoes = true,
+                Relatorios = true,
+                Usuarios = true
+            }
+        },
+        new()
+        {
+            Id = 2,
+            Nome = "Operador Atendimento",
+            Email = "operador@empresa.com.br",
+            Perfil = "Operador",
+            Ativo = true,
+            Permissoes = new PermissoesUsuario
+            {
+                Funcionarios = true,
+                Retiradas = true,
+                Notificacoes = true
+            }
+        }
+    };
+
+    private IEnumerable<UsuarioViewModel> UsuariosFiltrados =>
+        usuarios.Where(u =>
+            string.IsNullOrWhiteSpace(busca) ||
+            u.Nome.Contains(busca, StringComparison.OrdinalIgnoreCase) ||
+            u.Email.Contains(busca, StringComparison.OrdinalIgnoreCase) ||
+            u.Perfil.Contains(busca, StringComparison.OrdinalIgnoreCase)
+        );
+
+    private void AbrirCadastro()
+    {
+        editando = false;
+        usuarioForm = new UsuarioViewModel
+        {
+            Perfil = "Operador",
+            Ativo = true,
+            Permissoes = new PermissoesUsuario()
+        };
+
+        exibirFormulario = true;
+    }
+
+    private void EditarUsuario(UsuarioViewModel usuario)
+    {
+        editando = true;
+
+        usuarioForm = new UsuarioViewModel
+        {
+            Id = usuario.Id,
+            Nome = usuario.Nome,
+            Email = usuario.Email,
+            Perfil = usuario.Perfil,
+            Ativo = usuario.Ativo,
+            Permissoes = usuario.Permissoes.Clone()
+        };
+
+        exibirFormulario = true;
+    }
+
+    private void SalvarUsuario()
+    {
+        if (editando)
+        {
+            var usuario = usuarios.FirstOrDefault(x => x.Id == usuarioForm.Id);
+
+            if (usuario is not null)
+            {
+                usuario.Nome = usuarioForm.Nome;
+                usuario.Email = usuarioForm.Email;
+                usuario.Perfil = usuarioForm.Perfil;
+                usuario.Ativo = usuarioForm.Ativo;
+                usuario.Permissoes = usuarioForm.Permissoes;
+            }
+        }
+        else
+        {
+            usuarioForm.Id = usuarios.Max(x => x.Id) + 1;
+            usuarios.Add(usuarioForm);
+        }
+
+        exibirFormulario = false;
+    }
+
+    private void ExcluirUsuario(int id)
+    {
+        var usuario = usuarios.FirstOrDefault(x => x.Id == id);
+
+        if (usuario is not null)
+            usuarios.Remove(usuario);
+    }
+
+    private void Cancelar()
+    {
+        exibirFormulario = false;
+    }
+
+    public class UsuarioViewModel
+    {
+        public int Id { get; set; }
+        public string Nome { get; set; } = "";
+        public string Email { get; set; } = "";
+        public string Perfil { get; set; } = "Operador";
+        public bool Ativo { get; set; } = true;
+        public PermissoesUsuario Permissoes { get; set; } = new();
+    }
+
+    public class PermissoesUsuario
+    {
+        public bool Funcionarios { get; set; }
+        public bool Retiradas { get; set; }
+        public bool Notificacoes { get; set; }
+        public bool Relatorios { get; set; }
+        public bool Usuarios { get; set; }
+
+        public List<string> ListarAtivas()
+        {
+            var lista = new List<string>();
+
+            if (Funcionarios) lista.Add("Funcionários");
+            if (Retiradas) lista.Add("Retiradas");
+            if (Notificacoes) lista.Add("Notificações");
+            if (Relatorios) lista.Add("Relatórios");
+            if (Usuarios) lista.Add("Usuários");
+
+            return lista;
+        }
+
+        public PermissoesUsuario Clone()
+        {
+            return new PermissoesUsuario
+            {
+                Funcionarios = Funcionarios,
+                Retiradas = Retiradas,
+                Notificacoes = Notificacoes,
+                Relatorios = Relatorios,
+                Usuarios = Usuarios
+            };
+        }
+    }
+}

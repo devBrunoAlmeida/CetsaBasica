@@ -1,0 +1,188 @@
+@page "/login"
+
+@namespace CestaBasica.Web.Pages.Login
+@using CestaBasica.Web.Models.Requests
+@using CestaBasica.Web.Services
+@using Microsoft.AspNetCore.Components.Forms
+
+@inject UsuarioApiService UsuarioService
+@inject NavigationManager Navigation
+
+
+<div class="login-page">
+
+    <div class="login-left">
+
+        <div class="overlay"></div>
+
+        <div class="left-content">
+
+            <h1>
+                <p>
+                    Solução corporativa desenvolvida para otimizar processos,
+                    ampliar a transparência operacional e garantir maior eficiência
+                    na administração de programas de assistência e distribuição.
+                </p>
+                <span>Distribuição de Cestas Básicas</span>
+            </h1>
+
+            <p>
+                Tecnologia e gestão para promover solidariedade,
+                eficiência e impacto social.
+            </p>
+
+            <div class="features">
+
+                <div class="feature-item">
+                    🔒 Segurança
+                </div>
+
+                <div class="feature-item">
+                    👥 Transparência
+                </div>
+
+                <div class="feature-item">
+                    📈 Eficiência
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="login-right">
+
+        <div class="top-options">
+
+            <div class="tipo-usuario">
+                <label>Tipo de Usuário</label>
+
+                <select class="form-select">
+                    <option>Administrador</option>
+                    <option>Usuário Comum</option>
+                </select>
+            </div>
+
+            <button class="contrast-btn">
+                Alto Contraste
+            </button>
+
+        </div>
+
+        <div class="login-card">
+
+            <div class="logo-area">
+
+                <div class="logo-icon">
+                    🧺
+                </div>
+
+                <h2>
+                    Sistema de Apoio à Gestão de
+                    Programas de Distribuição de
+                    Cestas Básicas
+                </h2>
+
+            </div>
+
+            <EditForm Model="login"
+                      OnSubmit="FazerLogin"
+                      FormName="loginForm">
+
+                <div class="mb-4">
+
+                    <label class="form-label">
+                        E-mail
+                    </label>
+
+                    <InputText class="form-control input-custom"
+                               @bind-Value="login.Email" />
+
+                </div>
+
+                <div class="mb-4">
+
+                    <label class="form-label">
+                        Senha
+                    </label>
+
+                    <InputText type="password"
+                               class="form-control input-custom"
+                               @bind-Value="login.Senha" />
+
+                </div>
+
+                <div class="login-options">
+
+                    <div>
+                        <input type="checkbox" />
+                        <span>Lembrar-me</span>
+                    </div>
+
+                    <a href="#">
+                        Esqueci minha senha
+                    </a>
+
+                </div>
+
+                <button type="submit"
+                        class="btn-login">
+
+                    Entrar
+
+                </button>
+
+            </EditForm>
+
+            @if (!string.IsNullOrEmpty(mensagem))
+            {
+                <div class="alert alert-danger mt-4">
+                    @mensagem
+                </div>
+            }
+
+            <div class="security-text">
+                🔐 Ambiente seguro. Seus dados estão protegidos.
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@code {
+
+    private LoginRequest login = new();
+
+    private string mensagem = "";
+
+    private void FazerLogin()
+    {
+        Navigation.NavigateTo("/dashboard");
+    }
+
+    @*private async Task FazerLogin()
+     {
+        try
+        {
+            mensagem = "";
+
+            var response = await UsuarioService.LoginAsync(login);
+
+            if (response != null)
+            {
+                Navigation.NavigateTo("/dashboard");
+            }
+            else
+            {
+                mensagem = "Credenciais inválidas. Verifique as informações e tente novamente.";
+            }
+        }
+        catch
+        {
+            mensagem = "Não foi possível realizar a autenticação no momento.";
+        }
+    } *@
+}

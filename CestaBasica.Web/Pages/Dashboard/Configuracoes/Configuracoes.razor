@@ -1,0 +1,110 @@
+@page "/configuracoes"
+
+<div class="settings-page">
+     <div>
+            <a href="/dashboard" class="btn-back">
+                ← Voltar
+            </a>
+        </div>
+    <div class="page-header">
+        <div>
+            <h1>Configurações do Sistema</h1>
+            <p>Gerencie parâmetros operacionais, segurança, notificações e auditoria da plataforma.</p>
+        </div>
+
+        <button class="btn-primary">
+            Salvar alterações
+        </button>
+    </div>
+
+    <section class="settings-grid">
+
+        <div class="settings-card">
+            <div class="card-icon blue">🔔</div>
+            <h2>Canais de Notificação</h2>
+            <p>Configure os canais utilizados para comunicação com funcionários.</p>
+
+            <label><input type="checkbox" checked /> WhatsApp habilitado</label>
+            <label><input type="checkbox" checked /> SMS habilitado</label>
+            <label><input type="checkbox" /> Envio automático de lembretes</label>
+        </div>
+
+        <div class="settings-card">
+            <div class="card-icon yellow">⏱️</div>
+            <h2>Configuração de Sessão</h2>
+            <p>Defina regras de permanência e expiração de acesso.</p>
+
+            <div class="form-group">
+                <label>Tempo de sessão</label>
+                <select>
+                    <option>30 minutos</option>
+                    <option>1 hora</option>
+                    <option>2 horas</option>
+                </select>
+            </div>
+
+            <label><input type="checkbox" checked /> Encerrar sessão por inatividade</label>
+        </div>
+
+        <div class="settings-card">
+            <div class="card-icon green">💾</div>
+            <h2>Backup</h2>
+            <p>Configure rotinas de cópia de segurança dos dados do sistema.</p>
+
+            <div class="form-group">
+                <label>Frequência</label>
+                <select>
+                    <option>Diário</option>
+                    <option>Semanal</option>
+                    <option>Mensal</option>
+                </select>
+            </div>
+
+            <button class="btn-secondary">Executar backup agora</button>
+        </div>
+
+        <div class="settings-card">
+            <div class="card-icon purple">👥</div>
+            <h2>Usuários</h2>
+            <p>Defina políticas de acesso, perfis e permissões administrativas.</p>
+
+            <label><input type="checkbox" checked /> Permitir cadastro de operadores</label>
+            <label><input type="checkbox" /> Exigir aprovação de administrador</label>
+        </div>
+
+        <div class="settings-card">
+            <div class="card-icon red">🔐</div>
+            <h2>Segurança</h2>
+            <p>Gerencie regras de autenticação e proteção dos dados.</p>
+
+            <label><input type="checkbox" checked /> Autenticação segura</label>
+            <label><input type="checkbox" checked /> Bloqueio após tentativas inválidas</label>
+            <label><input type="checkbox" /> Autenticação em duas etapas</label>
+        </div>
+
+        <div class="settings-card logs-card">
+            <div class="card-icon dark">📋</div>
+            <h2>Logs do Sistema</h2>
+            <p>Acompanhe eventos administrativos e ações críticas.</p>
+
+            <div class="logs-list">
+                <div>
+                    <strong>Login administrativo</strong>
+                    <span>16/05/2026 10:40</span>
+                </div>
+
+                <div>
+                    <strong>Backup executado</strong>
+                    <span>16/05/2026 09:00</span>
+                </div>
+
+                <div>
+                    <strong>Usuário atualizado</strong>
+                    <span>15/05/2026 17:25</span>
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+</div>

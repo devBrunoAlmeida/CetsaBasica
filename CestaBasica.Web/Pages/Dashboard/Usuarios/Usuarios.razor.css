@@ -1,0 +1,267 @@
+.users-page {
+    min-height: 100vh;
+    background: #f4f7fb;
+    padding: 32px;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.page-header,
+.table-header,
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+
+.page-header h1,
+.table-header h2,
+.card-header h2 {
+    color: #002b6b;
+    font-weight: 800;
+    justify-content: center;
+}
+
+.page-header p,
+.table-header span,
+.card-header span {
+    color: #64748b;
+}
+
+.filters-card,
+.form-card,
+.table-card {
+    background: white;
+    border-radius: 26px;
+    padding: 26px;
+    box-shadow: 0 12px 30px rgba(0, 43, 107, 0.08);
+    margin-bottom: 24px;
+}
+
+.search-box label,
+.form-group label {
+    display: block;
+    color: #002b6b;
+    font-weight: 800;
+    margin-bottom: 10px;
+}
+
+.search-box input,
+.form-group input,
+.form-group select {
+    width: 100%;
+    height: 50px;
+    border: 1px solid #d6e1f0;
+    border-radius: 14px;
+    padding: 0 15px;
+    outline: none;
+}
+
+.search-box input:focus,
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #005be0;
+    box-shadow: 0 0 0 0.2rem rgba(0, 91, 224, 0.12);
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+}
+
+.permissions-box {
+    margin-top: 24px;
+    background: #f8fbff;
+    border-radius: 18px;
+    padding: 22px;
+}
+
+.permissions-box h3 {
+    color: #002b6b;
+    font-size: 18px;
+    font-weight: 800;
+    margin-bottom: 18px;
+}
+
+.permissions-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+}
+
+.permissions-grid label {
+    background: white;
+    border: 1px solid #edf2f7;
+    border-radius: 14px;
+    padding: 14px;
+    color: #334155;
+    font-weight: 700;
+}
+
+.permissions-grid input {
+    margin-right: 8px;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.btn-primary,
+.btn-secondary {
+    height: 46px;
+    border-radius: 14px;
+    padding: 0 22px;
+    border: none;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background: linear-gradient(90deg, #004bbd, #006dff);
+    color: white;
+    justify-content: center;
+    display: inline-flex;
+    align-items: center;
+}
+
+.btn-secondary {
+    background: #edf4ff;
+    color: #003b95;
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    min-width: 980px;
+    border-collapse: collapse;
+}
+
+thead {
+    background: #f4f7fb;
+}
+
+th {
+    text-align: left;
+    padding: 16px;
+    color: #002b6b;
+    font-size: 14px;
+}
+
+td {
+    padding: 16px;
+    border-bottom: 1px solid #edf2f7;
+    color: #334155;
+    vertical-align: top;
+}
+
+td strong {
+    display: block;
+    color: #0f172a;
+}
+
+td small {
+    color: #64748b;
+}
+
+.profile-badge,
+.status-badge {
+    padding: 8px 13px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.profile-badge.admin {
+    background: #fff6d8;
+    color: #a06b00;
+}
+
+.profile-badge.operator {
+    background: #edf4ff;
+    color: #005be0;
+}
+
+.status-badge.active {
+    background: #e9f9ef;
+    color: #168a45;
+}
+
+.status-badge.inactive {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.permissions-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.permissions-tags span {
+    background: #f4f7fb;
+    color: #003b95;
+    border-radius: 999px;
+    padding: 7px 11px;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.actions {
+    display: flex;
+    gap: 8px;
+}
+
+.actions button {
+    width: 38px;
+    height: 38px;
+    border: none;
+    border-radius: 12px;
+    background: #edf4ff;
+    cursor: pointer;
+}
+
+.actions button:hover {
+    background: #dbeafe;
+}
+
+@media (max-width: 900px) {
+    .page-header,
+    .table-header,
+    .card-header,
+    .form-actions {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .form-grid,
+    .permissions-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+        width: 100%;
+    }
+}
+
+@media (max-width: 640px) {
+    .users-page {
+        padding: 20px;
+    }
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+

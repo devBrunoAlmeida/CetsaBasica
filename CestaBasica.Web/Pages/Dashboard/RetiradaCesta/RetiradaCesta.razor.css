@@ -1,0 +1,270 @@
+.withdraw-page {
+    min-height: 100vh;
+    background: #f4f7fb;
+    padding: 32px;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.page-header,
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.page-header h1,
+.panel-header h2 {
+    color: #002b6b;
+    font-weight: 800;
+}
+
+.page-header p,
+.panel-header span {
+    color: #64748b;
+}
+
+.content-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.1fr;
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.panel,
+.history-panel {
+    background: #ffffff;
+    border-radius: 26px;
+    padding: 26px;
+    box-shadow: 0 12px 30px rgba(0, 43, 107, 0.08);
+}
+
+.form-group {
+    margin-bottom: 22px;
+}
+
+.form-group label {
+    display: block;
+    color: #002b6b;
+    font-weight: 800;
+    margin-bottom: 10px;
+}
+
+.input-custom {
+    width: 100%;
+    height: 56px;
+    border: 1px solid #d6e1f0;
+    border-radius: 16px;
+    padding: 0 16px;
+    outline: none;
+}
+
+.input-custom:focus {
+    border-color: #005be0;
+    box-shadow: 0 0 0 0.2rem rgba(0, 91, 224, 0.12);
+}
+
+.divider {
+    display: flex;
+    align-items: center;
+    margin: 24px 0;
+    color: #64748b;
+}
+
+.divider::before,
+.divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: #edf2f7;
+}
+
+.divider span {
+    padding: 0 14px;
+    font-weight: 700;
+}
+
+.search-results {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.search-results button {
+    text-align: left;
+    border: none;
+    border-radius: 16px;
+    background: #f8fbff;
+    padding: 16px;
+    cursor: pointer;
+}
+
+.search-results strong {
+    display: block;
+    color: #002b6b;
+}
+
+.search-results span {
+    color: #64748b;
+}
+
+.employee-info {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    background: #f8fbff;
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 22px;
+}
+
+.avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 18px;
+    background: #005be0;
+    color: white;
+    font-size: 28px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.employee-info h3 {
+    color: #002b6b;
+    font-weight: 800;
+    margin: 0;
+}
+
+.employee-info p {
+    color: #64748b;
+    margin: 4px 0 0;
+}
+
+.details-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    margin-bottom: 22px;
+}
+
+.details-grid div,
+.date-box {
+    background: #f4f7fb;
+    border-radius: 16px;
+    padding: 16px;
+}
+
+.details-grid span,
+.date-box span {
+    display: block;
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.details-grid strong,
+.date-box strong {
+    color: #002b6b;
+}
+
+.status {
+    color: #a06b00 !important;
+}
+
+.btn-confirm {
+    width: 100%;
+    height: 56px;
+    border: none;
+    border-radius: 16px;
+    background: linear-gradient(90deg, #004bbd, #006dff);
+    color: white;
+    font-weight: 800;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 50px 20px;
+    color: #64748b;
+}
+
+.empty-state div {
+    font-size: 52px;
+}
+
+.empty-state h3 {
+    color: #002b6b;
+    margin-top: 18px;
+}
+
+.success-alert {
+    background: #e9f9ef;
+    color: #168a45;
+    border-radius: 18px;
+    padding: 18px;
+    font-weight: 800;
+    margin-bottom: 24px;
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    min-width: 780px;
+    border-collapse: collapse;
+}
+
+thead {
+    background: #f4f7fb;
+}
+
+th {
+    text-align: left;
+    padding: 16px;
+    color: #002b6b;
+    font-size: 14px;
+}
+
+td {
+    padding: 16px;
+    border-bottom: 1px solid #edf2f7;
+    color: #334155;
+}
+
+.badge {
+    background: #e9f9ef;
+    color: #168a45;
+    padding: 8px 13px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+@media (max-width: 950px) {
+    .content-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .page-header,
+    .panel-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+@media (max-width: 640px) {
+    .withdraw-page {
+        padding: 20px;
+    }
+
+    .details-grid {
+        grid-template-columns: 1fr;
+    }
+}
