@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using CestaBasica.Api.Applications;
-using CestaBasica.Api.DTOs;
+using CestaBasica.Shared.DTOs;
 
 namespace CestaBasica.Api.Controllers;
 

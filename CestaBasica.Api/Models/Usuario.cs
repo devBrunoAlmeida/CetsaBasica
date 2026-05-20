@@ -1,4 +1,4 @@
-using CestaBasica.Api.Enums;
+using CestaBasica.Shared.Enums;
 
 namespace CestaBasica.Api.Models;
 

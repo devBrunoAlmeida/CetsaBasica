@@ -17,6 +17,9 @@ builder.Services.AddSwaggerGen();
 #region Configurações de banco
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
+Console.WriteLine("CONNECTION STRING:");
+Console.WriteLine(connectionString);
+
 if (string.IsNullOrWhiteSpace(connectionString))
     throw new Exception("ConnectionString DefaultConnection não configurada.");
 

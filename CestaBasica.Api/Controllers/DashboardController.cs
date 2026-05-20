@@ -15,9 +15,24 @@ public class DashboardController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> ObterDados()
+    public async Task<IActionResult> ObterDados(
+    [FromQuery] DateTime? dataInicio,
+    [FromQuery] DateTime? dataFim)
     {
-        var result = await _app.ObterDadosAsync();
-        return Ok(result);
+        try
+        {
+            var result = await _app.ObterDadosAsync(dataInicio, dataFim);
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new
+            {
+                mensagem = ex.Message,
+                detalhe = ex.InnerException?.Message
+            });
+        }
     }
+
+
 }

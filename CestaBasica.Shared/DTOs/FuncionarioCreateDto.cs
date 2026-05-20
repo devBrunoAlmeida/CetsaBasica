@@ -1,4 +1,4 @@
-namespace CestaBasica.Api.DTOs;
+namespace CestaBasica.Shared.DTOs;
 
 public class FuncionarioCreateDto
 {

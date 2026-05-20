@@ -1,4 +1,4 @@
-using CestaBasica.Api.DTOs;
+using CestaBasica.Shared.DTOs;
 using CestaBasica.Api.Models;
 using CestaBasica.Api.Services;
 

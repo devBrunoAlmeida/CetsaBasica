@@ -1,6 +1,6 @@
-using CestaBasica.Api.DTOs;
 using CestaBasica.Api.Models;
 using CestaBasica.Api.Repositories;
+using CestaBasica.Shared.DTOs;
 
 namespace CestaBasica.Api.Services;
 

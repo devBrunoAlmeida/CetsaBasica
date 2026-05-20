@@ -1,5 +1,8 @@
 @page "/dashboard"
 @using Microsoft.AspNetCore.Components.Routing
+@using System.Net.Http.Json
+@using CestaBasica.Shared.DTOs
+@inject HttpClient Http
 
 <div class="dashboard-page">
 
@@ -65,7 +68,7 @@
             <div class="card-stat">
                 <div>
                     <span>Total de Funcionários</span>
-                    <h2>1.248</h2>
+                    <h2>@(carregando ? "..." : dashboard?.TotalFuncionarios)</h2>
                 </div>
                 <div class="card-icon blue">👥</div>
             </div>
@@ -73,7 +76,7 @@
             <div class="card-stat">
                 <div>
                     <span>Total de Retiradas</span>
-                    <h2>856</h2>
+                    <h2>@(carregando ? "..." : dashboard?.TotalRetiradas)</h2>
                 </div>
                 <div class="card-icon green">📦</div>
             </div>
@@ -81,7 +84,7 @@
             <div class="card-stat">
                 <div>
                     <span>Total Pendentes</span>
-                    <h2>132</h2>
+                    <h2>@(carregando ? "..." : dashboard?.TotalCestasDisponiveis)</h2>
                 </div>
                 <div class="card-icon yellow">⏳</div>
             </div>
@@ -89,7 +92,7 @@
             <div class="card-stat">
                 <div>
                     <span>Notificações Enviadas</span>
-                    <h2>2.430</h2>
+                    <h2>@(carregando ? "..." : dashboard?.TotalNotificacoes)</h2>
                 </div>
                 <div class="card-icon purple">🔔</div>
             </div>
@@ -205,6 +208,20 @@
 
 @code {
     private bool menuAberto = true;
+    private DashboardDto? dashboard;
+    private bool carregando = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            dashboard = await Http.GetFromJsonAsync<DashboardDto>("http://localhost:5237/api/dashboard");
+        }
+        finally
+        {
+            carregando = false;
+        }
+    }
 
     private void AlternarMenu()
     {

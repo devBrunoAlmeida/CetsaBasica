@@ -1,6 +1,6 @@
-using CestaBasica.Api.DTOs;
 using CestaBasica.Api.Models;
 using CestaBasica.Api.Repositories;
+using CestaBasica.Shared.DTOs;
 
 namespace CestaBasica.Api.Services;
 
@@ -35,10 +35,11 @@ public class NotificacaoService
             FuncionarioId = funcionario.Id,
             Canal = dto.Canal,
             Telefone = funcionario.Telefone,
+            Titulo = dto.Titulo,
             Mensagem = dto.Mensagem,
             Status = "Enviado",
             ProtocoloExterno = Guid.NewGuid().ToString(),
-            EnviadoEm = DateTime.Now
+            DataEnvio = DateTime.Now
         };
 
         return await _notificacaoRepository.CriarAsync(notificacao);

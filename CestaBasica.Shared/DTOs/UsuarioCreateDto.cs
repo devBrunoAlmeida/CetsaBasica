@@ -1,6 +1,6 @@
-using CestaBasica.Api.Enums;
+using CestaBasica.Shared.Enums;
 
-namespace CestaBasica.Api.DTOs;
+namespace CestaBasica.Shared.DTOs;
 
 public class UsuarioCreateDto
 {
