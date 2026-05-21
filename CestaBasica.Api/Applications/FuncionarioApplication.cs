@@ -13,7 +13,7 @@ public class FuncionarioApplication
         _service = service;
     }
 
-    public async Task<Funcionario> CriarAsync(FuncionarioCreateDto dto)
+    public async Task<Funcionario> CriarAsync(FuncionarioDto dto)
     {
         return await _service.CriarAsync(dto);
     }
@@ -21,5 +21,9 @@ public class FuncionarioApplication
     public async Task<List<Funcionario>> ListarAsync()
     {
         return await _service.ListarAsync();
+    }
+    public async Task ExcluirAsync(int id)
+    {
+        await _service.ExcluirAsync(id);
     }
 }

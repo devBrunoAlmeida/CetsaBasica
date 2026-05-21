@@ -1,111 +1,63 @@
-.dashboard-page {
-    min-height: 100vh;
+
+.bar-chart {
+    height: 260px;
     display: flex;
-    background: #f4f7fb;
-    font-family: 'Segoe UI', sans-serif;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 18px;
+    padding-top: 20px;
+    border-bottom: 1px solid #d6e1f0;
 }
 
-.sidebar {
-    width: 260px;
-    background: linear-gradient(180deg, #002b6b, #004bbd);
-    color: white;
-    padding: 24px 18px;
-    transition: 0.3s;
-}
 
-.sidebar.collapsed {
-    width: 90px;
-}
-
-.sidebar-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-size: 20px;
-    font-weight: 800;
-    margin-bottom: 25px;
-}
-
-.logo {
-    width: 44px;
-    height: 44px;
-    border-radius: 14px;
-    background: #ffc107;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.toggle-btn {
-    width: 100%;
-    border: none;
-    border-radius: 12px;
-    background: rgba(255,255,255,0.15);
-    color: white;
-    padding: 10px;
-    margin-bottom: 20px;
-}
-
-.sidebar nav {
+.chart-column {
+    flex: 1;
+    height: 100%;
     display: flex;
     flex-direction: column;
-    gap: 12px;
-}
-
-.sidebar nav a {
-    text-decoration: none !important;
-}
-
-.sidebar nav a span {
-    display: flex;
     align-items: center;
+    justify-content: flex-end;
+    background: transparent;
+}
 
-    gap: 12px;
+.chart-value {
+    margin-bottom: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #0f172a;
+    background: transparent;
+    padding: 0;
+    border-radius: 0;
+    box-shadow: none;
+}
 
+.chart-bar-container {
+    height: 180px;
     width: 100%;
-
-    padding: 14px 16px;
-
-    border-radius: 16px;
-
-    color: rgba(255,255,255,0.95);
-
-    font-weight: 600;
-
-    transition: all 0.25s ease;
-
-    text-decoration: none !important;
-}
-
-.sidebar nav a span:hover {
-    background: rgba(255,255,255,0.16);
-
-    box-shadow:
-        0 10px 24px rgba(0,0,0,0.16);
-
-    transform: translateX(4px);
-}
-
-.sidebar nav a.active span {
-    background: white;
-
-    color: #002b6b;
-
-    box-shadow:
-        0 10px 24px rgba(0,0,0,0.18);
-}
-
-.sidebar.collapsed nav a span {
+    display: flex;
+    align-items: flex-end;
     justify-content: center;
+    margin-top: 8px;
+    background: transparent;
 }
 
-.sidebar.collapsed nav a span {
-    font-size: 0;
+.chart-bar {
+    width: 46px;
+    background: linear-gradient(180deg, #005be0, #003b95);
+    border-radius: 12px 12px 0 0;
+    min-height: 12px;
+    transition: all 0.3s ease;
 }
 
-.sidebar.collapsed nav a span::first-letter {
-    font-size: 18px;
+.chart-label {
+    margin-top: 10px;
+    width: 100%;
+    text-align: center;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 600;
 }
+
 .dashboard-content {
     flex: 1;
     padding: 32px;
@@ -222,29 +174,6 @@
     color: #64748b;
 }
 
-.bar-chart {
-    height: 260px;
-    display: flex;
-    align-items: end;
-    gap: 20px;
-    border-bottom: 1px solid #d6e1f0;
-}
-
-.bar-chart div {
-    flex: 1;
-    background: linear-gradient(180deg, #005be0, #003b95);
-    border-radius: 12px 12px 0 0;
-    position: relative;
-}
-
-.bar-chart span {
-    position: absolute;
-    bottom: -28px;
-    width: 100%;
-    text-align: center;
-    color: #64748b;
-}
-
 .sector-list {
     display: flex;
     flex-direction: column;
@@ -349,5 +278,89 @@ td {
 
     .cards-grid {
         grid-template-columns: 1fr;
+    }
+}
+
+.toast-overlay {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 9999;
+}
+
+.toast-popup {
+    width: 380px;
+    max-width: calc(100vw - 32px);
+
+    background: #ffffff;
+    border-radius: 20px;
+
+    padding: 18px 20px;
+
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+
+    box-shadow:
+        0 12px 35px rgba(15, 23, 42, 0.18);
+
+    border-left: 6px solid #f59e0b;
+
+    animation: toastIn 0.35s ease;
+}
+
+.toast-icon {
+    width: 42px;
+    height: 42px;
+
+    min-width: 42px;
+
+    border-radius: 50%;
+
+    background: #fff7ed;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 20px;
+}
+
+.toast-content strong {
+    display: block;
+
+    color: #0f172a;
+
+    font-size: 16px;
+    font-weight: 800;
+
+    margin-bottom: 4px;
+}
+
+.toast-content p {
+    margin: 0 0 8px;
+
+    color: #475569;
+
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.toast-content small {
+    color: #f59e0b;
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+@keyframes toastIn {
+    from {
+        opacity: 0;
+        transform: translateX(60px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
     }
 }

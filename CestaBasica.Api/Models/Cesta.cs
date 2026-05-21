@@ -12,5 +12,5 @@ public class Cesta
 
     public bool Ativa { get; set; } = true;
 
-    public DateTime CriadoEm { get; set; } = DateTime.Now;
+    public DateTime CriadoEm { get; set; } = DateTime.UtcNow;
 }

@@ -41,4 +41,17 @@ public class FuncionarioRepository
     {
         return await _context.Funcionarios.FirstOrDefaultAsync(f => f.Id == id);
     }
+
+    public async Task ExcluirAsync(int id)
+{
+    var funcionario = await _context.Funcionarios
+        .FirstOrDefaultAsync(x => x.Id == id);
+
+    if (funcionario is null)
+        throw new Exception("Funcionário não encontrado.");
+
+    _context.Funcionarios.Remove(funcionario);
+
+    await _context.SaveChangesAsync();
+}
 }

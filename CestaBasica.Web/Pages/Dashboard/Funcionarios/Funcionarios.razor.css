@@ -1,10 +1,22 @@
 .employees-page {
-    min-height: 100vh;
-    background: #f4f7fb;
     padding: 32px;
-    font-family: 'Segoe UI', sans-serif;
+}
+.header-left h1 {
+    color: #002b6b;
+    font-size: 32px;
+    font-weight: 800;
 }
 
+.header-left p {
+    color: #64748b;
+    margin-top: 6px;
+}
+
+.header-actions {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+}
 .page-header {
     display: flex;
     justify-content: space-between;
@@ -33,14 +45,18 @@
     font-weight: 800;
 }
 
-.btn-primary {
-    background: linear-gradient(90deg, #004bbd, #006dff);
-    color: white;
-}
-
+.btn-primary,
 .btn-secondary {
-    background: #edf4ff;
-    color: #003b95;
+    border: none;
+    border-radius: 14px;
+    min-height: 46px;
+    padding: 0 22px;
+    font-weight: 800;
+    text-decoration: none;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .filters-card,
@@ -225,6 +241,11 @@ td small {
 
     .filter-group {
         grid-template-columns: 1fr;
+    }
+
+    .header-actions {
+        flex-direction: column;
+        width: 100%;
     }
 
     .btn-primary,

@@ -13,7 +13,7 @@ public class FuncionarioService
         _repo = repo;
     }
 
-    public async Task<Funcionario> CriarAsync(FuncionarioCreateDto dto)
+    public async Task<Funcionario> CriarAsync(FuncionarioDto dto)
     {
         if (string.IsNullOrWhiteSpace(dto.Nome))
             throw new Exception("Nome é obrigatório");
@@ -33,5 +33,9 @@ public class FuncionarioService
     public async Task<List<Funcionario>> ListarAsync()
     {
         return await _repo.ListarAsync();
+    }
+    public async Task ExcluirAsync(int id)
+    {
+        await _repo.ExcluirAsync(id);
     }
 }

@@ -1,54 +1,25 @@
 @page "/dashboard"
+@rendermode @(new Microsoft.AspNetCore.Components.Web.InteractiveServerRenderMode(prerender: false))
 @using Microsoft.AspNetCore.Components.Routing
-@using System.Net.Http.Json
-@using CestaBasica.Shared.DTOs
-@inject HttpClient Http
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Web
 
-<div class="dashboard-page">
 
-    <aside class="sidebar @(menuAberto ? "" : "collapsed")">
-        <div class="sidebar-header">
-            <div class="logo">🧺</div>
-            @if (menuAberto)
-            {
-                <span>Gestão Social</span>
-            }
+    @if (!string.IsNullOrWhiteSpace(mensagemErro))
+    {
+        <div class="toast-overlay">
+            <div class="toast-popup">
+                <div class="toast-icon">⚠️</div>
+
+                <div class="toast-content">
+                    <strong>Atenção</strong>
+                    <p>@mensagemErro</p>
+                    <small>Fechando em @segundosRestantes segundo(s)...</small>
+                </div>
+            </div>
         </div>
-
-        <button class="toggle-btn" @onclick="AlternarMenu">
-            ☰
-        </button>
-
-        <nav>
-
-            <NavLink href="/dashboard" Match="NavLinkMatch.All">
-                <span>📊 Dashboard</span>
-            </NavLink>
-
-            <NavLink href="/funcionarios">
-                <span>👥 Funcionários</span>
-            </NavLink>
-
-            <NavLink href="/retiradas">
-                <span>📦 Retiradas</span>
-            </NavLink>
-
-            <NavLink href="/notificacoes">
-                <span>🔔 Notificações</span>
-            </NavLink>
-
-            <NavLink href="/usuarios">
-                <span>🛡️ Usuários</span>
-            </NavLink>
-
-            <NavLink href="/configuracoes">
-                <span>⚙️ Configurações</span>
-            </NavLink>
-
-        </nav>
-    </aside>
-
-    <main class="dashboard-content">
+    }
+    <div class="dashboard-content">
 
         <header class="topbar">
             <div>
@@ -57,9 +28,12 @@
             </div>
 
             <div class="filters">
-                <input type="date" />
-                <input type="date" />
-                <button>Filtrar</button>
+                <InputDate @bind-Value="dataInicio" />
+                <InputDate @bind-Value="dataFim" />
+
+                <button type="button" @onclick="CarregarDashboard">
+                    Filtrar
+                </button>
             </div>
         </header>
 
@@ -83,10 +57,10 @@
 
             <div class="card-stat">
                 <div>
-                    <span>Total Pendentes</span>
+                    <span>Cestas disponíveis</span>
                     <h2>@(carregando ? "..." : dashboard?.TotalCestasDisponiveis)</h2>
                 </div>
-                <div class="card-icon yellow">⏳</div>
+                <div class="card-icon yellow">📦</div>
             </div>
 
             <div class="card-stat">
@@ -108,12 +82,32 @@
                 </div>
 
                 <div class="bar-chart">
-                    <div style="height:45%"><span>Jan</span></div>
-                    <div style="height:65%"><span>Fev</span></div>
-                    <div style="height:55%"><span>Mar</span></div>
-                    <div style="height:80%"><span>Abr</span></div>
-                    <div style="height:70%"><span>Mai</span></div>
-                    <div style="height:90%"><span>Jun</span></div>
+                    @{
+                        var evolucao = dashboard?.EvolucaoRetiradas ?? [];
+                        var maiorValor = evolucao.Any() ? evolucao.Max(x => x.Total) : 1;
+                    }
+
+                    @foreach (var item in evolucao)
+                    {
+                        var altura = item.Total > 0
+                            ? Math.Max((item.Total * 100m) / maiorValor, 8)
+                            : 4;
+
+                        <div class="chart-column">
+                            <small class="chart-value">
+                                @item.Total.ToString("N0")
+                            </small>
+
+                            <div class="chart-bar-container">
+                                <div class="chart-bar"
+                                     style="height:@($"{altura.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)}%")">
+                                </div>
+                            </div>
+
+                            <span class="chart-label">@item.Mes</span>
+                        </div>
+                    }
+
                 </div>
             </div>
 
@@ -124,10 +118,15 @@
                 </div>
 
                 <div class="sector-list">
-                    <div><span>Assistência Social</span><strong>42%</strong></div>
-                    <div><span>Educação</span><strong>28%</strong></div>
-                    <div><span>Saúde</span><strong>18%</strong></div>
-                    <div><span>Administração</span><strong>12%</strong></div>
+
+                    @foreach (var setor in dashboard?.DistribuicaoPorSetor ?? [])
+                    {
+                        <div>
+                            <span>@setor.Setor</span>
+                            <strong>@setor.Porcentagem%</strong>
+                        </div>
+                    }
+
                 </div>
             </div>
 
@@ -152,26 +151,25 @@
                     </thead>
 
                     <tbody>
-                        <tr>
-                            <td>Maria Oliveira</td>
-                            <td>Educação</td>
-                            <td>16/05/2026</td>
-                            <td><span class="badge success">Retirada</span></td>
-                        </tr>
 
-                        <tr>
-                            <td>João Santos</td>
-                            <td>Saúde</td>
-                            <td>16/05/2026</td>
-                            <td><span class="badge warning">Pendente</span></td>
-                        </tr>
+                        @foreach (var retirada in dashboard?.UltimasRetiradas ?? [])
+                        {
+                            <tr>
+                                <td>@retirada.Funcionario</td>
+                                <td>@retirada.Setor</td>
 
-                        <tr>
-                            <td>Ana Lima</td>
-                            <td>Assistência Social</td>
-                            <td>15/05/2026</td>
-                            <td><span class="badge success">Retirada</span></td>
-                        </tr>
+                                <td>
+                                    @(retirada.Data?.ToString("dd/MM/yyyy"))
+                                </td>
+
+                                <td>
+                                    <span class="badge success">
+                                        @retirada.Status
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+
                     </tbody>
                 </table>
             </div>
@@ -183,48 +181,29 @@
                 </div>
 
                 <div class="notification-list">
-                    <div>
-                        <strong>Convocação enviada</strong>
-                        <p>Funcionários pendentes foram notificados.</p>
-                    </div>
 
-                    <div>
-                        <strong>Nova retirada registrada</strong>
-                        <p>Benefício confirmado com sucesso.</p>
-                    </div>
+                    @foreach (var notificacao in dashboard?.NotificacoesRecentes ?? [])
+                    {
+                        <div>
 
-                    <div>
-                        <strong>Relatório atualizado</strong>
-                        <p>Dados consolidados do período atual.</p>
-                    </div>
+                            <strong>
+                                @notificacao.Titulo
+                            </strong>
+
+                            <p>
+                                @notificacao.Mensagem
+                            </p>
+
+                            <small>
+                                @(notificacao.DataEnvio?.ToString("dd/MM/yyyy HH:mm"))
+                            </small>
+
+                        </div>
+                    }
+
                 </div>
             </div>
 
         </section>
 
-    </main>
-
-</div>
-
-@code {
-    private bool menuAberto = true;
-    private DashboardDto? dashboard;
-    private bool carregando = true;
-
-    protected override async Task OnInitializedAsync()
-    {
-        try
-        {
-            dashboard = await Http.GetFromJsonAsync<DashboardDto>("http://localhost:5237/api/dashboard");
-        }
-        finally
-        {
-            carregando = false;
-        }
-    }
-
-    private void AlternarMenu()
-    {
-        menuAberto = !menuAberto;
-    }
-}
+    </div>

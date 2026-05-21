@@ -10,7 +10,7 @@ builder.Services.AddScoped<UsuarioApiService>();
 
 builder.Services.AddScoped(sp => new HttpClient
 {
-    BaseAddress = new Uri("http://localhost:5237/")
+    BaseAddress = new Uri("http://localhost:5237/login")
 });
 
 var app = builder.Build();
@@ -24,6 +24,7 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseStaticFiles();
+
 app.UseAntiforgery();
 
 app.MapRazorComponents<App>()

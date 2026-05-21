@@ -16,7 +16,7 @@ public class FuncionariosController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Criar(FuncionarioCreateDto dto)
+    public async Task<IActionResult> Criar(FuncionarioDto dto)
     {
         var result = await _app.CriarAsync(dto);
         return Ok(result);
@@ -27,5 +27,12 @@ public class FuncionariosController : ControllerBase
     {
         var result = await _app.ListarAsync();
         return Ok(result);
+    }
+
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> Excluir(int id)
+    {
+        await _app.ExcluirAsync(id);
+        return NoContent();
     }
 }

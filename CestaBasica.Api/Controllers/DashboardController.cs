@@ -24,14 +24,21 @@ public class DashboardController : ControllerBase
             var result = await _app.ObterDadosAsync(dataInicio, dataFim);
             return Ok(result);
         }
-        catch (Exception ex)
+        catch (ArgumentException ex)
+    {
+        return BadRequest(new
         {
-            return StatusCode(500, new
-            {
-                mensagem = ex.Message,
-                detalhe = ex.InnerException?.Message
-            });
-        }
+            mensagem = ex.Message
+        });
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(500, new
+        {
+            mensagem = "Erro interno ao carregar dashboard.",
+            detalhe = ex.Message
+        });
+    }
     }
 
 

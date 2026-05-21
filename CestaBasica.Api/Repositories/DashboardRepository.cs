@@ -15,24 +15,42 @@ public class DashboardRepository
 
     public async Task<DashboardDto> ObterDadosAsync(DateTime? dataInicio, DateTime? dataFim)
     {
-        var hoje = DateTime.Today;
+        var hoje = DateTime.UtcNow;
 
-        dataInicio ??= hoje.AddYears(-1);
-        dataFim ??= hoje;
+        if (dataFim.HasValue && dataFim.Value.Date > hoje)
+            throw new ArgumentException("A data final não pode ser maior que a data atual.");
 
-        var fim = dataFim.Value.Date.AddDays(1);
+        if (dataInicio.HasValue && dataInicio.Value.Date > hoje)
+            throw new ArgumentException("A data inicial não pode ser maior que a data atual.");
+
+        if (dataInicio.HasValue && dataFim.HasValue && dataInicio.Value.Date > dataFim.Value.Date)
+            throw new ArgumentException("A data inicial não pode ser maior que a data final.");
+
+        dataInicio = dataInicio.HasValue
+            ? DateTime.SpecifyKind(dataInicio.Value.Date, DateTimeKind.Utc)
+            : hoje.AddYears(-1).Date;
+
+        dataFim = dataFim.HasValue
+            ? DateTime.SpecifyKind(dataFim.Value.Date, DateTimeKind.Utc)
+            : hoje.Date;
+
+        var fim = dataFim.Value.AddDays(1);
 
         var retiradasQuery = _context.Retiradas
             .Include(r => r.Funcionario)
-            .Where(r => r.DataRetirada >= dataInicio.Value && r.DataRetirada < fim);
+            .Where(r => r.DataRetirada >= dataInicio.Value &&
+                        r.DataRetirada < fim);
 
         var notificacoesQuery = _context.Notificacoes
-            .Where(n => n.DataEnvio >= dataInicio.Value && n.DataEnvio < fim);
+            .Where(n => n.DataEnvio >= dataInicio.Value &&
+                        n.DataEnvio < fim);
 
         var totalFuncionarios = await _context.Funcionarios.CountAsync();
 
-        var setores = await _context.Funcionarios
-            .GroupBy(f => f.Setor)
+        var totalRetiradasPeriodo = await retiradasQuery.CountAsync();
+
+        var setores = await retiradasQuery
+            .GroupBy(r => r.Funcionario.Setor)
             .Select(g => new
             {
                 Setor = g.Key,
@@ -44,9 +62,9 @@ public class DashboardRepository
             .Select(s => new SetorDashboardDto
             {
                 Setor = s.Setor,
-                Porcentagem = totalFuncionarios == 0
+                Porcentagem = totalRetiradasPeriodo == 0
                     ? 0
-                    : Math.Round((decimal)s.Total * 100 / totalFuncionarios, 2)
+                    : Math.Round((decimal)s.Total * 100 / totalRetiradasPeriodo, 2)
             })
             .ToList();
 
@@ -88,17 +106,23 @@ public class DashboardRepository
                 DataEnvio = n.DataEnvio
             })
             .ToListAsync();
+        var totalCestasEstoque = await _context.Cestas
+    .Select(c => (int?)c.QuantidadeDisponivel)
+    .SumAsync() ?? 0;
+
+        var totalCestasDisponiveis = Math.Max(
+            0,
+            totalCestasEstoque - totalRetiradasPeriodo
+        );
 
         return new DashboardDto
         {
             TotalFuncionarios = totalFuncionarios,
             TotalCestas = await _context.Cestas.CountAsync(),
-            TotalRetiradas = await retiradasQuery.CountAsync(),
+            TotalRetiradas = totalRetiradasPeriodo,
             TotalNotificacoes = await notificacoesQuery.CountAsync(),
 
-            TotalCestasDisponiveis = await _context.Cestas
-                .Select(c => (int?)c.QuantidadeDisponivel)
-                .SumAsync() ?? 0,
+            TotalCestasDisponiveis = totalCestasDisponiveis,
 
             DistribuicaoPorSetor = distribuicaoPorSetor,
             EvolucaoRetiradas = evolucaoRetiradas,

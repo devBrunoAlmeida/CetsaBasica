@@ -1,19 +1,55 @@
 ﻿@inherits LayoutComponentBase
+@using Microsoft.AspNetCore.Components.Routing
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+<div class="app-layout">
 
-    <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+    <aside class="sidebar @(menuAberto ? "" : "collapsed")">
+
+        <div class="sidebar-header">
+            <div class="logo">🧺</div>
+
+            @if (menuAberto)
+            {
+                <span>Gestão Social</span>
+            }
         </div>
 
-        <article class="content px-4">
-            @Body
-        </article>
+        <button class="toggle-btn" @onclick="AlternarMenu">
+            ☰
+        </button>
+
+        <nav>
+            <NavLink href="/dashboard" Match="NavLinkMatch.All">
+                <span>📊 Dashboard</span>
+            </NavLink>
+
+            <NavLink href="/funcionarios">
+                <span>👥 Funcionários</span>
+            </NavLink>
+
+            <NavLink href="/retiradas">
+                <span>📦 Retiradas</span>
+            </NavLink>
+
+            <NavLink href="/notificacoes">
+                <span>🔔 Notificações</span>
+            </NavLink>
+
+            <NavLink href="/usuarios">
+                <span>🛡️ Usuários</span>
+            </NavLink>
+
+            <NavLink href="/configuracoes">
+                <span>⚙️ Configurações</span>
+            </NavLink>
+        </nav>
+
+    </aside>
+
+    <main class="page-content">
+        @Body
     </main>
+
 </div>
 
 <div id="blazor-error-ui">
@@ -21,3 +57,12 @@
     <a href="" class="reload">Reload</a>
     <a class="dismiss">🗙</a>
 </div>
+
+@code {
+    private bool menuAberto = true;
+
+    private void AlternarMenu()
+    {
+        menuAberto = !menuAberto;
+    }
+}
