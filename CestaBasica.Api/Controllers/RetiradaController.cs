@@ -16,7 +16,7 @@ public class RetiradasController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Registrar(RetiradaRequestDto dto)
+    public async Task<IActionResult> Registrar(RetiradaCestaDto dto)
     {
         try
         {

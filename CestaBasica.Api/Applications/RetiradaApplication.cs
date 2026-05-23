@@ -13,7 +13,7 @@ public class RetiradaApplication
         _service = service;
     }
 
-    public async Task<Retirada> RegistrarRetiradaAsync(RetiradaRequestDto dto)
+    public async Task<Retirada> RegistrarRetiradaAsync(RetiradaCestaDto dto)
     {
         return await _service.RegistrarRetiradaAsync(dto);
     }

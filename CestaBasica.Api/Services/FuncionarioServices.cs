@@ -6,11 +6,11 @@ namespace CestaBasica.Api.Services;
 
 public class FuncionarioService
 {
-    private readonly FuncionarioRepository _repo;
+    private readonly FuncionarioRepository _funcionarioRepository;
 
     public FuncionarioService(FuncionarioRepository repo)
     {
-        _repo = repo;
+        _funcionarioRepository = repo;
     }
 
     public async Task<Funcionario> CriarAsync(FuncionarioDto dto)
@@ -27,15 +27,31 @@ public class FuncionarioService
             Setor = dto.Setor
         };
 
-        return await _repo.CriarAsync(funcionario);
+        return await _funcionarioRepository.CriarAsync(funcionario);
     }
 
     public async Task<List<Funcionario>> ListarAsync()
     {
-        return await _repo.ListarAsync();
+        return await _funcionarioRepository.ListarAsync();
     }
     public async Task ExcluirAsync(int id)
     {
-        await _repo.ExcluirAsync(id);
+        await _funcionarioRepository.ExcluirAsync(id);
+    }
+    public async Task<Funcionario> AtualizarAsync(FuncionarioDto dto)
+    {
+        var funcionario =
+            await _funcionarioRepository.BuscarPorIdAsync(dto.Id);
+
+        if (funcionario is null)
+            throw new Exception("Funcionário não encontrado.");
+
+        funcionario.Nome = dto.Nome;
+        funcionario.Telefone = dto.Telefone;
+        funcionario.Matricula = dto.Matricula;
+        funcionario.CodigoBarras = dto.CodigoBarras;
+        funcionario.Setor = dto.Setor;
+
+        return await _funcionarioRepository.AtualizarAsync(funcionario);
     }
 }

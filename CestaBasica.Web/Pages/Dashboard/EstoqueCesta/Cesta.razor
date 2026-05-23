@@ -1,0 +1,83 @@
+@page "/cestas"
+@using CestaBasica.Shared.DTOs
+
+<div class="cestas-page">
+    <div class="page-header">
+        <div>
+            <h1>Controle de Cestas</h1>
+            <p>Cadastro de lotes, estoque disponível e status das cestas básicas.</p>
+        </div>
+    </div>
+
+    <section class="form-card">
+        <h2>Novo lote de cesta</h2>
+
+        <div class="form-grid">
+            <div>
+                <label>Nome do lote</label>
+                <input @bind="novaCesta.Nome" placeholder="Ex: Lote Maio/2026" />
+            </div>
+
+            <div>
+                <label>Quantidade disponível</label>
+                <input type="number" @bind="novaCesta.QuantidadeDisponivel" />
+            </div>
+
+            <div class="full">
+                <label>Descrição</label>
+                <textarea @bind="novaCesta.Descricao" placeholder="Descrição do lote"></textarea>
+            </div>
+        </div>
+
+        <button class="btn-primary" @onclick="CadastrarCesta">
+            + Cadastrar lote
+        </button>
+    </section>
+
+    <section class="table-card">
+        <div class="table-header">
+            <div>
+                <h2>Lotes cadastrados</h2>
+                <span>Total: <strong>@cestas.Count</strong></span>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Descrição</th>
+                        <th>Quantidade</th>
+                        <th>Data criação</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var cesta in cestas)
+                    {
+                        <tr>
+                            <td><strong>@cesta.Nome</strong></td>
+                            <td>@cesta.Descricao</td>
+                            <td>@cesta.QuantidadeDisponivel</td>
+                            <td>@cesta.DataCriacao.ToString("dd/MM/yyyy")</td>
+                            <td>
+                                <span class="badge @(cesta.Ativa ? "success" : "danger")">
+                                    @(cesta.Ativa ? "Ativa" : "Desativada")
+                                </span>
+                            </td>
+                            <td>
+                                <button title="Desativar"
+                                        @onclick="() => DesativarCesta(cesta.Id)">
+                                    🚫
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>

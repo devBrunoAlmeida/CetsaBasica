@@ -13,7 +13,7 @@ public class CestaApplication
         _service = service;
     }
 
-    public async Task<Cesta> CriarAsync(CestaCreateDto dto)
+    public async Task<Cesta> CriarAsync(CestaDto dto)
     {
         return await _service.CriarAsync(dto);
     }

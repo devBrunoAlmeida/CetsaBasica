@@ -13,7 +13,7 @@ public class CestaService
         _repo = repo;
     }
 
-    public async Task<Cesta> CriarAsync(CestaCreateDto dto)
+    public async Task<Cesta> CriarAsync(CestaDto dto)
     {
         if (string.IsNullOrWhiteSpace(dto.Nome))
             throw new Exception("Nome da cesta é obrigatório.");

@@ -16,7 +16,7 @@ public class CestasController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Criar(CestaCreateDto dto)
+    public async Task<IActionResult> Criar(CestaDto dto)
     {
         try
         {

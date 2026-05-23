@@ -8,10 +8,11 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddScoped<UsuarioApiService>();
 
-builder.Services.AddScoped(sp => new HttpClient
-{
-    BaseAddress = new Uri("http://localhost:5237/login")
-});
+builder.Services.AddScoped(sp =>
+    new HttpClient
+    {
+        BaseAddress = new Uri("http://localhost:5237/")
+    });
 
 var app = builder.Build();
 

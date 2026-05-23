@@ -2,8 +2,6 @@
 @using Microsoft.AspNetCore.Components.Routing
 @using Microsoft.AspNetCore.Components.Web
 
-
-
 <div class="employees-page">
     <div class="page-header">
         <div class="header-left">
@@ -14,10 +12,10 @@
             </div>
         </div>
         <div class="header-actions">
-            <NavLink href="/funcionarios/novo" class="btn-primary">
+            <NavLink href="/novo" class="btn-primary">
                 + Novo funcionário
             </NavLink>
-            <NavLink href="/funcionarios/importacao" class="btn-primary">
+            <NavLink href="/importacao" class="btn-primary">
                 + Importar funcionários
             </NavLink>
         </div>
@@ -25,7 +23,8 @@
     <section class="filters-card">
         <div class="search-box">
             <label>Busca rápida</label>
-            <input placeholder="Pesquisar por nome, matrícula ou código de barras..." @bind="termoBusca" @bind:event="oninput" />
+            <input placeholder="Pesquisar por nome, matrícula ou código de barras..." @bind="termoBusca"
+                   @bind:event="oninput" />
         </div>
 
         <div class="filter-group">
@@ -88,41 +87,101 @@
                 </thead>
 
                 <tbody>
-                    @foreach (var funcionario in FuncionariosFiltrados)
+                    @foreach (var funcionario in FuncionariosPaginados)
                     {
-                        <tr>
+                        <tr class="@(EditarFuncionarioId == funcionario.Id ? "editing-row" : "")">
                             <td>
-                                <div class="employee-info">
-                                    <strong>@funcionario.Nome</strong>
-                                    <small>@funcionario.Email</small>
-                                </div>
+                                @if (EditarFuncionarioId == funcionario.Id)
+                                {
+                                    <input class="table-input" @bind="funcionario.Nome" />
+                                }
+                                else
+                                {
+                                    <div class="employee-info">
+                                        <strong>@funcionario.Nome</strong>
+                                    </div>
+                                }
                             </td>
-                            <td>@funcionario.Matricula</td>
-                            <td>@funcionario.CodigoBarras</td>
-                            <td>@funcionario.Telefone</td>
-                            <td>@funcionario.Setor</td>
+
+                            <td>
+                                @if (EditarFuncionarioId == funcionario.Id)
+                                {
+                                    <input class="table-input" @bind="funcionario.Matricula" />
+                                }
+                                else
+                                {
+                                    @funcionario.Matricula
+                                }
+                            </td>
+
+                            <td>
+                                @if (EditarFuncionarioId == funcionario.Id)
+                                {
+                                    <input class="table-input" @bind="funcionario.CodigoBarras" />
+                                }
+                                else
+                                {
+                                    @funcionario.CodigoBarras
+                                }
+                            </td>
+
+                            <td>
+                                @if (EditarFuncionarioId == funcionario.Id)
+                                {
+                                    <input class="table-input" @bind="funcionario.Telefone" />
+                                }
+                                else
+                                {
+                                    @funcionario.Telefone
+                                }
+                            </td>
+
+                            <td>
+                                @if (EditarFuncionarioId == funcionario.Id)
+                                {
+                                    <input class="table-input" @bind="funcionario.Setor" />
+                                }
+                                else
+                                {
+                                    @funcionario.Setor
+                                }
+                            </td>
+
                             <td>
                                 <span class="badge @(funcionario.Status == "Retirado" ? "success" : "warning")">
                                     @funcionario.Status
                                 </span>
                             </td>
+
                             <td>
                                 <div class="actions">
+                                    @if (EditarFuncionarioId == funcionario.Id)
+                                    {
+                                        <button type="button" title="Salvar" @onclick="() => SalvarFuncionario(funcionario)">
+                                            💾
+                                        </button>
 
-                                    <button type="button" title="Editar" @onclick="() => EditarFuncionario(funcionario.Id)">
-                                        ✏️
-                                    </button>
+                                        <button type="button" title="Cancelar" @onclick="CancelarEdicao">
+                                            ❌
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button type="button" title="Editar"
+                                                @onclick="() => EditarFuncionarioId = funcionario.Id">
+                                            ✏️
+                                        </button>
 
-                                    <button type="button" title="Excluir"
-                                            @onclick="() => ExcluirFuncionario(funcionario.Id)">
-                                        🗑️
-                                    </button>
+                                        <button type="button" title="Excluir"
+                                                @onclick="() => ExcluirFuncionario(funcionario.Id)">
+                                            🗑️
+                                        </button>
 
-                                    <button type="button" title="Visualizar histórico"
-                                            @onclick="() => VisualizarHistorico(funcionario.Id)">
-                                        📄
-                                    </button>
-
+                                        <button type="button" title="Visualizar histórico"
+                                                @onclick="() => VisualizarHistorico(funcionario)">
+                                            📄
+                                        </button>
+                                    }
                                 </div>
                             </td>
                         </tr>
@@ -132,15 +191,48 @@
         </div>
 
         <div class="pagination">
-            <span>Exibindo 1-5 de 128 registros</span>
+            <span>
+                Página @PaginaAtual de @TotalPaginas —
+                Total: <strong>@TotalFuncionarios</strong> registros
+            </span>
 
             <div>
-                <button>Anterior</button>
-                <button class="active">1</button>
-                <button>2</button>
-                <button>3</button>
-                <button>Próxima</button>
+                <button disabled="@(PaginaAtual == 1)" @onclick="PaginaAnterior">
+                    Anterior
+                </button>
+
+                @for (var i = 1; i <= TotalPaginas; i++)
+                {
+                    var pagina = i;
+
+                    <button class="@(PaginaAtual == pagina ? "active" : "")" @onclick="() => IrParaPagina(pagina)">
+                        @pagina
+                    </button>
+                }
+
+                <button disabled="@(PaginaAtual == TotalPaginas)" @onclick="ProximaPagina">
+                    Próxima
+                </button>
             </div>
         </div>
     </section>
+    @if (MostrarHistorico && FuncionarioHistorico is not null)
+    {
+        <div class="modal-overlay">
+            <div class="modal-card">
+                <div class="modal-header">
+                    <h3>Histórico de retirada</h3>
+                    <button type="button" @onclick="FecharHistorico">✖</button>
+                </div>
+
+                <p><strong>Funcionário:</strong> @FuncionarioHistorico.Nome</p>
+                <p><strong>Status:</strong> @FuncionarioHistorico.Status</p>
+
+                <div class="history-box">
+                    <p>📦 Última retirada: informação da API aqui</p>
+                    <p>📅 Próxima retirada: informação da API aqui</p>
+                </div>
+            </div>
+        </div>
+    }
 </div>

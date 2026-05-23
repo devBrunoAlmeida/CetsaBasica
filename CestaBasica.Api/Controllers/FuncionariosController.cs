@@ -35,4 +35,14 @@ public class FuncionariosController : ControllerBase
         await _app.ExcluirAsync(id);
         return NoContent();
     }
+    
+    [HttpPut("{id:int}")]
+    public async Task<IActionResult> Atualizar(int id, FuncionarioDto dto)
+    {
+        dto.Id = id;
+
+        var result = await _app.AtualizarAsync(dto);
+
+        return Ok(result);
+    }
 }

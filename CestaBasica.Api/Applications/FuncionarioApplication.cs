@@ -22,8 +22,15 @@ public class FuncionarioApplication
     {
         return await _service.ListarAsync();
     }
+
+    public async Task<Funcionario> AtualizarAsync(FuncionarioDto dto)
+    {
+        return await _service.AtualizarAsync(dto);
+    }
+
     public async Task ExcluirAsync(int id)
     {
         await _service.ExcluirAsync(id);
     }
+
 }

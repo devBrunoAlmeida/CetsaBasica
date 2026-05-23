@@ -15,7 +15,7 @@ public class DashboardRepository
 
     public async Task<DashboardDto> ObterDadosAsync(DateTime? dataInicio, DateTime? dataFim)
     {
-        var hoje = DateTime.UtcNow;
+        var hoje = DateTime.UtcNow.Date;
 
         if (dataFim.HasValue && dataFim.Value.Date > hoje)
             throw new ArgumentException("A data final não pode ser maior que a data atual.");

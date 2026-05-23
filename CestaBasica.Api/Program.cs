@@ -66,7 +66,7 @@ if (app.Environment.IsDevelopment())
 }
 
 // HTTPS
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 // Mapear controllers
 app.MapControllers();

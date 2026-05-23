@@ -20,7 +20,7 @@ public class RetiradaService
         _retiradaRepository = retiradaRepository;
     }
 
-    public async Task<Retirada> RegistrarRetiradaAsync(RetiradaRequestDto dto)
+    public async Task<Retirada> RegistrarRetiradaAsync(RetiradaCestaDto dto)
     {
         if (string.IsNullOrWhiteSpace(dto.CodigoBarras))
             throw new Exception("Código de barras é obrigatório.");
@@ -30,7 +30,7 @@ public class RetiradaService
         if (funcionario == null)
             throw new Exception("Funcionário não encontrado.");
 
-        var cesta = await _cestaRepository.BuscarPorIdAsync(dto.CestaId);
+        var cesta = await _cestaRepository.BuscarPorIdAsync(dto.Id);
 
         if (cesta == null)
             throw new Exception("Cesta não encontrada.");

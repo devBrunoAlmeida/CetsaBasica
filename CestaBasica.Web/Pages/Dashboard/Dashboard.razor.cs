@@ -1,7 +1,6 @@
 using System.Net.Http.Json;
 using CestaBasica.Shared.DTOs;
 using Microsoft.AspNetCore.Components;
-using System.Linq;
 
 
 namespace CestaBasica.Web.Pages.Dashboard;
@@ -41,14 +40,12 @@ public partial class Dashboard : ComponentBase
 }
     protected async Task CarregarDashboard()
     {
-        Console.WriteLine("CLICOU NO FILTRAR");
-
         carregando = true;
         mensagemErro = null;
 
         try
         {
-            var url = "http://localhost:5237/api/dashboard";
+            var url = "api/dashboard";
             var parametros = new List<string>();
 
             if (dataInicio.HasValue)
@@ -86,10 +83,12 @@ public partial class Dashboard : ComponentBase
         finally
         {
             carregando = false;
+            StateHasChanged();
         }
     }
     protected void AlternarMenu()
     {
         menuAberto = !menuAberto;
     }
+    
 }
