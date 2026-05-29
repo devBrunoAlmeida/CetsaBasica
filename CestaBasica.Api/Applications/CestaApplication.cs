@@ -1,6 +1,6 @@
-using CestaBasica.Shared.DTOs;
 using CestaBasica.Api.Models;
 using CestaBasica.Api.Services;
+using CestaBasica.Shared.DTOs;
 
 namespace CestaBasica.Api.Applications;
 
@@ -13,13 +13,35 @@ public class CestaApplication
         _service = service;
     }
 
-    public async Task<Cesta> CriarAsync(CestaDto dto)
+    public async Task<List<CestaDto>> ListarAsync()
     {
-        return await _service.CriarAsync(dto);
+        var cestas = await _service.ListarAsync();
+
+        return cestas.Select(c => new CestaDto
+        {
+            Id = c.Id,
+            Nome = c.Nome,
+            Descricao = c.Descricao,
+            Ativa = c.Ativa,
+            QuantidadeDisponivel = c.QuantidadeDisponivel,
+            DataCriacao = c.DataCriacao
+        }).ToList();
     }
 
-    public async Task<List<Cesta>> ListarAsync()
+    public async Task CadastrarAsync(CestaDto dto)
     {
-        return await _service.ListarAsync();
+        var cesta = new Cesta
+        {
+            Nome = dto.Nome,
+            Descricao = dto.Descricao,
+            QuantidadeDisponivel = dto.QuantidadeDisponivel
+        };
+
+        await _service.CadastrarAsync(cesta);
+    }
+
+    public async Task DesativarAsync(int id)
+    {
+        await _service.DesativarAsync(id);
     }
 }

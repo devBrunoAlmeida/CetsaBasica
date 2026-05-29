@@ -1,6 +1,7 @@
 using System.Net.Http.Json;
 using CestaBasica.Shared.DTOs;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 
 
 
@@ -14,13 +15,57 @@ public partial class Funcionarios : ComponentBase
     protected List<FuncionarioDto> funcionarios = [];
     protected int? EditarFuncionarioId;
 
-    protected override async Task OnInitializedAsync()
+    protected int TotalFuncionarios => FuncionariosFiltrados.Count();
+
+    protected string termoBusca = string.Empty;
+    protected string filtroStatus = string.Empty;
+    protected string filtroSetor = string.Empty;
+
+    protected DateTime? dataInicial;
+    protected DateTime? dataFinal;
+
+    protected int PaginaAtual = 1;
+    protected int ItensPorPagina = 20;
+
+    protected List<string> setores = [];
+    protected void ResetarPagina()
     {
-        funcionarios =
-            await Http.GetFromJsonAsync<List<FuncionarioDto>>
-            ("api/funcionarios")
-            ?? [];
+        PaginaAtual = 1;
     }
+    protected void FiltrarDataInicial(ChangeEventArgs e)
+    {
+        if (DateTime.TryParse(e.Value?.ToString(), out var data))
+            dataInicial = data;
+        else
+            dataInicial = null;
+
+        ResetarPagina();
+    }
+
+    protected void FiltrarDataFinal(ChangeEventArgs e)
+    {
+        if (DateTime.TryParse(e.Value?.ToString(), out var data))
+            dataFinal = data;
+        else
+            dataFinal = null;
+
+        ResetarPagina();
+    }
+
+    protected override async Task OnInitializedAsync()
+{
+    funcionarios =
+        await Http.GetFromJsonAsync<List<FuncionarioDto>>
+        ("api/funcionarios")
+        ?? [];
+
+    setores = funcionarios
+        .Where(f => !string.IsNullOrWhiteSpace(f.Setor))
+        .Select(f => f.Setor)
+        .Distinct()
+        .OrderBy(s => s)
+        .ToList();
+}
 
     private async Task SalvarFuncionario(FuncionarioDto funcionario)
     {
@@ -37,7 +82,6 @@ public partial class Funcionarios : ComponentBase
             EditarFuncionarioId = null;
         }
     }
-
     private void CancelarEdicao()
     {
         EditarFuncionarioId = null;
@@ -53,34 +97,31 @@ public partial class Funcionarios : ComponentBase
             funcionarios.RemoveAll(x => x.Id == id);
         }
     }
-    protected string termoBusca = string.Empty;
-
     protected IEnumerable<FuncionarioDto> FuncionariosFiltrados =>
-        string.IsNullOrWhiteSpace(termoBusca)
-            ? funcionarios
-            : funcionarios.Where(f =>
-                f.Nome.Contains(termoBusca, StringComparison.OrdinalIgnoreCase) ||
-                f.Matricula.Contains(termoBusca, StringComparison.OrdinalIgnoreCase) ||
-                f.CodigoBarras.Contains(termoBusca, StringComparison.OrdinalIgnoreCase)
-            );
-    protected int TotalFuncionarios => FuncionariosFiltrados.Count();
+     funcionarios.Where(f =>
+     {
+         var buscaOk = string.IsNullOrWhiteSpace(termoBusca)
+             || f.NomeCompleto.Contains(termoBusca, StringComparison.OrdinalIgnoreCase)
+             || f.Matricula.Contains(termoBusca, StringComparison.OrdinalIgnoreCase)
+             || f.CodigoBarras.Contains(termoBusca, StringComparison.OrdinalIgnoreCase);
 
-    protected bool MostrarHistorico;
-    protected FuncionarioDto? FuncionarioHistorico;
+         var statusOk = string.IsNullOrWhiteSpace(filtroStatus)
+             || f.Status == filtroStatus;
 
-    private void VisualizarHistorico(FuncionarioDto funcionario)
-    {
-        FuncionarioHistorico = funcionario;
-        MostrarHistorico = true;
-    }
+         var setorOk = string.IsNullOrWhiteSpace(filtroSetor)
+             || f.Setor == filtroSetor;
 
-    private void FecharHistorico()
-    {
-        MostrarHistorico = false;
-        FuncionarioHistorico = null;
-    }
-    protected int PaginaAtual = 1;
-    protected int ItensPorPagina = 20;
+         return buscaOk && statusOk && setorOk;
+     });
+
+
+    [Inject]
+private NavigationManager Navigation { get; set; } = default!;
+
+private void VisualizarHistorico(FuncionarioDto funcionario)
+{
+    Navigation.NavigateTo($"/funcionarios/{funcionario.Id}/historico");
+}
 
     protected int TotalPaginas =>
         (int)Math.Ceiling((double)TotalFuncionarios / ItensPorPagina);

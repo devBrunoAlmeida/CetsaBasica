@@ -11,6 +11,6 @@ public class CestaDto
     public bool Ativa { get; set; } = true;
 
     public int QuantidadeDisponivel { get; set; }
-public DateTime DataCriacao { get; set; }
+    public DateTime DataCriacao { get; set; }
 }
 

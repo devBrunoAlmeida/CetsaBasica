@@ -39,7 +39,7 @@ public class NotificacaoService
             Mensagem = dto.Mensagem,
             Status = "Enviado",
             ProtocoloExterno = Guid.NewGuid().ToString(),
-            DataEnvio = DateTime.Now
+            DataEnvio = DateTime.UtcNow
         };
 
         return await _notificacaoRepository.CriarAsync(notificacao);

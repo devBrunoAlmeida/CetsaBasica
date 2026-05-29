@@ -1,38 +1,48 @@
 using CestaBasica.Api.Models;
 using CestaBasica.Api.Repositories;
-using CestaBasica.Shared.DTOs;
 
 namespace CestaBasica.Api.Services;
 
 public class CestaService
 {
-    private readonly CestaRepository _repo;
+    private readonly CestaRepository _repository;
 
-    public CestaService(CestaRepository repo)
+    public CestaService(CestaRepository repository)
     {
-        _repo = repo;
-    }
-
-    public async Task<Cesta> CriarAsync(CestaDto dto)
-    {
-        if (string.IsNullOrWhiteSpace(dto.Nome))
-            throw new Exception("Nome da cesta é obrigatório.");
-
-        if (dto.QuantidadeDisponivel < 0)
-            throw new Exception("Quantidade não pode ser negativa.");
-
-        var cesta = new Cesta
-        {
-            Nome = dto.Nome,
-            Descricao = dto.Descricao,
-            QuantidadeDisponivel = dto.QuantidadeDisponivel
-        };
-
-        return await _repo.CriarAsync(cesta);
+        _repository = repository;
     }
 
     public async Task<List<Cesta>> ListarAsync()
     {
-        return await _repo.ListarAsync();
+        return await _repository.ListarAsync();
+    }
+
+    public async Task CadastrarAsync(Cesta cesta)
+    {
+        if (string.IsNullOrWhiteSpace(cesta.Nome))
+            throw new Exception("O nome da cesta é obrigatório.");
+
+        if (cesta.QuantidadeDisponivel < 0)
+            throw new Exception("A quantidade não pode ser negativa.");
+
+        cesta.Ativa = true;
+        cesta.DataCriacao = DateTime.UtcNow;
+
+        await _repository.AdicionarAsync(cesta);
+    }
+
+    public async Task DesativarAsync(int id)
+    {
+        var cesta = await _repository.ObterPorIdAsync(id);
+
+        if (cesta is null)
+            throw new Exception("Cesta não encontrada.");
+
+        if (!cesta.Ativa)
+            throw new Exception("Cesta já está desativada.");
+
+        cesta.Ativa = false;
+
+        await _repository.AtualizarAsync(cesta);
     }
 }

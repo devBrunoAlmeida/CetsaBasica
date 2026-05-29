@@ -89,7 +89,7 @@ public class DashboardRepository
             .Take(5)
             .Select(r => new UltimaRetiradaDto
             {
-                Funcionario = r.Funcionario.Nome,
+                Funcionario = r.Funcionario.NomeCompleto,
                 Setor = r.Funcionario.Setor,
                 Data = r.DataRetirada,
                 Status = "Retirada"

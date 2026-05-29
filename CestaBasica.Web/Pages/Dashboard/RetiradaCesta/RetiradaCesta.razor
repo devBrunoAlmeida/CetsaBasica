@@ -1,5 +1,9 @@
 @page "/retiradas"
 
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Web
+
+
 <div class="withdraw-page">
 
     <div class="page-header">
@@ -21,7 +25,7 @@
                 <label>Código de barras</label>
                 <input class="input-custom"
                        placeholder="Leia ou digite o código de barras"
-                       @bind="codigoBarras"
+                       value="@codigoBarras"
                        @oninput="BuscarPorCodigo" />
             </div>
 
@@ -33,19 +37,22 @@
                 <label>Busca manual</label>
                 <input class="input-custom"
                        placeholder="Pesquisar por nome ou matrícula"
-                       @bind="buscaManual"
+                       value="@buscaManual"
                        @oninput="BuscarManual" />
             </div>
 
-            <div class="search-results">
-                @foreach (var item in resultadosBusca)
-                {
-                    <button @onclick="() => SelecionarFuncionario(item)">
-                        <strong>@item.Nome</strong>
-                        <span>@item.Matricula • @item.Setor</span>
-                    </button>
-                }
-            </div>
+            @if (resultadosBusca.Any())
+            {
+                <div class="search-results">
+                    @foreach (var item in resultadosBusca)
+                    {
+                        <button type="button" @onclick="() => SelecionarFuncionario(item)">
+                            <strong>@item.NomeCompleto</strong>
+                            <span>@item.Matricula • @item.Setor</span>
+                        </button>
+                    }
+                </div>
+            }
         </div>
 
         <div class="panel employee-card">
@@ -58,11 +65,11 @@
             {
                 <div class="employee-info">
                     <div class="avatar">
-                        @funcionarioSelecionado.Nome[..1]
+                        @funcionarioSelecionado.NomeCompleto[..1]
                     </div>
 
                     <div>
-                        <h3>@funcionarioSelecionado.Nome</h3>
+                        <h3>@funcionarioSelecionado.NomeCompleto</h3>
                         <p>@funcionarioSelecionado.Setor</p>
                     </div>
                 </div>
@@ -91,10 +98,10 @@
 
                 <div class="date-box">
                     <span>Data e hora do registro</span>
-                    <strong>@DateTime.Now.ToString("dd/MM/yyyy HH:mm")</strong>
+                    <strong>@DateTime.UtcNow.ToString("dd/MM/yyyy HH:mm")</strong>
                 </div>
 
-                <button class="btn-confirm" @onclick="ConfirmarRetirada">
+                <button type="button" class="btn-confirm" @onclick="ConfirmarRetirada">
                     Confirmar retirada
                 </button>
             }
@@ -130,20 +137,29 @@
                         <th>Funcionário</th>
                         <th>Matrícula</th>
                         <th>Setor</th>
-                        <th>Data/Hora</th>
                         <th>Status</th>
                     </tr>
                 </thead>
 
                 <tbody>
-                    @foreach (var item in historico)
+                    @if (historico.Any())
+                    {
+                        @foreach (var item in historico)
+                        {
+                            <tr>
+                                <td>@item.NomeCompleto</td>
+                                <td>@item.Matricula</td>
+                                <td>@item.Setor</td>
+                                <td><span class="badge">@item.Status</span></td>
+                            </tr>
+                        }
+                    }
+                    else
                     {
                         <tr>
-                            <td>@item.Nome</td>
-                            <td>@item.Matricula</td>
-                            <td>@item.Setor</td>
-                            <td>@item.DataHora</td>
-                            <td><span class="badge">Retirado</span></td>
+                            <td colspan="4" class="empty-table">
+                                Nenhuma retirada recente encontrada.
+                            </td>
                         </tr>
                     }
                 </tbody>
@@ -152,101 +168,3 @@
     </section>
 
 </div>
-
-@code {
-    private string codigoBarras = "";
-    private string buscaManual = "";
-    private bool retiradaConfirmada = false;
-    private string ultimoFuncionario = "";
-
-    private FuncionarioRetirada? funcionarioSelecionado;
-
-    private List<FuncionarioRetirada> funcionarios = new()
-    {
-        new("Maria Oliveira", "MAT-001", "789456123001", "(15) 99999-1001", "Educação", "Pendente"),
-        new("João Santos", "MAT-002", "789456123002", "(15) 99999-1002", "Saúde", "Pendente"),
-        new("Ana Lima", "MAT-003", "789456123003", "(15) 99999-1003", "Assistência Social", "Pendente")
-    };
-
-    private List<FuncionarioRetirada> resultadosBusca = new();
-
-    private List<HistoricoRetirada> historico = new()
-    {
-        new("Carlos Pereira", "MAT-010", "Administração", "16/05/2026 09:20"),
-        new("Fernanda Rocha", "MAT-011", "Educação", "16/05/2026 08:45")
-    };
-
-    private void BuscarPorCodigo(ChangeEventArgs e)
-    {
-        codigoBarras = e.Value?.ToString() ?? "";
-
-        funcionarioSelecionado = funcionarios
-            .FirstOrDefault(x => x.CodigoBarras == codigoBarras);
-
-        retiradaConfirmada = false;
-    }
-
-    private void BuscarManual(ChangeEventArgs e)
-    {
-        buscaManual = e.Value?.ToString() ?? "";
-
-        resultadosBusca = funcionarios
-            .Where(x =>
-                x.Nome.Contains(buscaManual, StringComparison.OrdinalIgnoreCase) ||
-                x.Matricula.Contains(buscaManual, StringComparison.OrdinalIgnoreCase))
-            .ToList();
-    }
-
-    private void SelecionarFuncionario(FuncionarioRetirada funcionario)
-    {
-        funcionarioSelecionado = funcionario;
-        resultadosBusca.Clear();
-        buscaManual = funcionario.Nome;
-        retiradaConfirmada = false;
-    }
-
-    private void ConfirmarRetirada()
-    {
-        if (funcionarioSelecionado is null)
-            return;
-
-        ultimoFuncionario = funcionarioSelecionado.Nome;
-        funcionarioSelecionado.Status = "Retirado";
-
-        historico.Insert(0, new HistoricoRetirada(
-            funcionarioSelecionado.Nome,
-            funcionarioSelecionado.Matricula,
-            funcionarioSelecionado.Setor,
-            DateTime.Now.ToString("dd/MM/yyyy HH:mm")
-        ));
-
-        retiradaConfirmada = true;
-    }
-
-    public class FuncionarioRetirada
-    {
-        public FuncionarioRetirada(string nome, string matricula, string codigoBarras, string telefone, string setor, string status)
-        {
-            Nome = nome;
-            Matricula = matricula;
-            CodigoBarras = codigoBarras;
-            Telefone = telefone;
-            Setor = setor;
-            Status = status;
-        }
-
-        public string Nome { get; set; }
-        public string Matricula { get; set; }
-        public string CodigoBarras { get; set; }
-        public string Telefone { get; set; }
-        public string Setor { get; set; }
-        public string Status { get; set; }
-    }
-
-    public record HistoricoRetirada(
-        string Nome,
-        string Matricula,
-        string Setor,
-        string DataHora
-    );
-}

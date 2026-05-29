@@ -15,24 +15,24 @@ public class CestasController : ControllerBase
         _app = app;
     }
 
-    [HttpPost]
-    public async Task<IActionResult> Criar(CestaDto dto)
-    {
-        try
-        {
-            var result = await _app.CriarAsync(dto);
-            return Ok(result);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { mensagem = ex.Message });
-        }
-    }
-
     [HttpGet]
     public async Task<IActionResult> Listar()
     {
-        var result = await _app.ListarAsync();
-        return Ok(result);
+        var cestas = await _app.ListarAsync();
+        return Ok(cestas);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Cadastrar([FromBody] CestaDto dto)
+    {
+        await _app.CadastrarAsync(dto);
+        return Ok();
+    }
+
+    [HttpPut("{id}/desativar")]
+    public async Task<IActionResult> Desativar(int id)
+    {
+        await _app.DesativarAsync(id);
+        return Ok();
     }
 }

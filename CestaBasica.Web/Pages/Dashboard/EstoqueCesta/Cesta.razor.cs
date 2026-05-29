@@ -45,4 +45,13 @@ public partial class Cesta : ComponentBase
             await CarregarCestas();
         }
     }
+    private async Task EditarCesta(int id)
+    {
+        var response = await Http.PutAsync($"api/cestas/{id}/editar", null);
+
+        if (response.IsSuccessStatusCode)
+        {
+            await CarregarCestas();
+        }
+    }
 }

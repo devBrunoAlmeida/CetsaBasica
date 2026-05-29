@@ -33,4 +33,24 @@ public class RetiradaRepository
             .Include(r => r.Cesta)
             .ToListAsync();
     }
+
+    public async Task<Retirada?> BuscarPorFuncionarioECestaAsync(
+    int funcionarioId,
+    int cestaId)
+    {
+        return await _context.Retiradas
+            .Where(r =>
+                r.FuncionarioId == funcionarioId &&
+                r.CestaId == cestaId)
+            .OrderByDescending(r => r.DataRetirada)
+            .FirstOrDefaultAsync();
+    }
+    public async Task<List<Retirada>> ListarRecentesAsync()
+    {
+        return await _context.Retiradas
+            .Include(r => r.Funcionario)
+            .OrderByDescending(r => r.DataRetirada)
+            .Take(10)
+            .ToListAsync();
+    }
 }

@@ -1,5 +1,7 @@
 @page "/cestas"
 @using CestaBasica.Shared.DTOs
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Web
 
 <div class="cestas-page">
     <div class="page-header">
@@ -15,7 +17,7 @@
         <div class="form-grid">
             <div>
                 <label>Nome do lote</label>
-                <input @bind="novaCesta.Nome" placeholder="Ex: Lote Maio/2026" />
+                <input @bind="novaCesta.Nome" placeholder="Ex: Cesta Básica Padrão" />
             </div>
 
             <div>
@@ -25,7 +27,7 @@
 
             <div class="full">
                 <label>Descrição</label>
-                <textarea @bind="novaCesta.Descricao" placeholder="Descrição do lote"></textarea>
+                <textarea @bind="novaCesta.Descricao" placeholder="Ex:Cesta básica mensal familiar"></textarea>
             </div>
         </div>
 
@@ -72,6 +74,12 @@
                                 <button title="Desativar"
                                         @onclick="() => DesativarCesta(cesta.Id)">
                                     🚫
+                                </button>
+                            </td>
+                             <td>
+                                <button title="Editar"
+                                        @onclick="() => EditarCesta(cesta.Id)">
+                                    ✏️
                                 </button>
                             </td>
                         </tr>

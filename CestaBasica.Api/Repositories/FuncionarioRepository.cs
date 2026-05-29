@@ -14,11 +14,12 @@ public class FuncionarioRepository
     }
 
     public async Task<Funcionario> CriarAsync(Funcionario funcionario)
-    {
-        _context.Funcionarios.Add(funcionario);
-        await _context.SaveChangesAsync();
-        return funcionario;
-    }
+{
+    _context.Funcionarios.Add(funcionario);
+    await _context.SaveChangesAsync();
+
+    return funcionario;
+}
 
     public async Task<List<Funcionario>> ListarAsync()
     {
@@ -54,4 +55,15 @@ public class FuncionarioRepository
 
     await _context.SaveChangesAsync();
 }
+
+public async Task<List<Funcionario>> BuscaManualAsync(string termo)
+{
+    return await _context.Funcionarios
+        .Where(f =>
+            f.NomeCompleto.ToLower().Contains(termo.ToLower()) ||
+            f.Matricula.ToLower().Contains(termo.ToLower()))
+        .Take(10)
+        .ToListAsync();
+}
+
 }

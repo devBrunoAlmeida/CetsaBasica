@@ -7,5 +7,5 @@ public class Retirada
     public Funcionario Funcionario { get; set; } = null!;
     public int CestaId { get; set; }
     public Cesta Cesta { get; set; } = null!;
-    public DateTime DataRetirada { get; set; } = DateTime.Now;
+    public DateTime DataRetirada { get; set; } = DateTime.UtcNow;
 }

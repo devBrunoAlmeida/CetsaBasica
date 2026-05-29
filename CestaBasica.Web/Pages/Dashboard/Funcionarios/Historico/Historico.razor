@@ -1,5 +1,4 @@
-@page "/historico"
-@using Microsoft.AspNetCore.Components.Routing
+@page "/funcionarios/{Id:int}/historico"
 @using Microsoft.AspNetCore.Components.Web
 
 <div class="history-page">
@@ -10,157 +9,150 @@
             <p>Consulta consolidada de dados pessoais, notificações, retiradas e eventos registrados.</p>
         </div>
 
-        <button class="btn-secondary">
+        <button class="btn-secondary" @onclick="Voltar">
             Voltar
         </button>
     </div>
 
-    <section class="employee-card">
-        <div class="avatar">MO</div>
+    @if (Funcionario is null)
+    {
+        <p>Carregando histórico...</p>
+    }
+    else
+    {
+        <section class="employee-card">
+            <div class="avatar">@ObterIniciais(Funcionario.NomeCompleto)</div>
 
-        <div class="employee-data">
-            <h2>Maria Oliveira</h2>
-            <p>Secretaria de Educação</p>
+            <div class="employee-data">
+                <h2>@Funcionario.NomeCompleto</h2>
+                <p>@Funcionario.Setor</p>
 
-            <div class="data-grid">
-                <div>
-                    <span>Matrícula</span>
-                    <strong>MAT-00124</strong>
-                </div>
+                <div class="data-grid">
+                    <div>
+                        <span>Matrícula</span>
+                        <strong>@Funcionario.Matricula</strong>
+                    </div>
 
-                <div>
-                    <span>Código de barras</span>
-                    <strong>7894561230001</strong>
-                </div>
+                    <div>
+                        <span>Código de barras</span>
+                        <strong>@Funcionario.CodigoBarras</strong>
+                    </div>
 
-                <div>
-                    <span>Telefone</span>
-                    <strong>(15) 99999-1001</strong>
-                </div>
+                    <div>
+                        <span>Telefone</span>
+                        <strong>@Funcionario.Telefone</strong>
+                    </div>
 
-                <div>
-                    <span>Status atual</span>
-                    <strong class="status-ok">Retirado</strong>
+                    <div>
+                        <span>Status atual</span>
+                        <strong class="status-ok">@HistoricoFuncionario?.Status</strong>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <section class="content-grid">
+        <section class="content-grid">
 
-        <div class="panel">
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>Histórico de Retiradas</h2>
+                    <span>Registros de entregas realizadas.</span>
+                </div>
+
+                @if (!Retiradas.Any())
+                {
+                    <p>Nenhuma retirada registrada.</p>
+                }
+                else
+                {
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Data/Hora</th>
+                                <th>Responsável</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach (var item in Retiradas)
+                            {
+                                <tr>
+                                    <td>@item.DataHora.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td>@item.Responsavel</td>
+                                    <td><span class="badge success">@item.Titulo</span></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            </div>
+
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>Histórico de Notificações</h2>
+                    <span>Comunicações enviadas ao funcionário.</span>
+                </div>
+
+                @if (!Notificacoes.Any())
+                {
+                    <p>Nenhuma notificação registrada.</p>
+                }
+                else
+                {
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Data/Hora</th>
+                                <th>Canal</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach (var item in Notificacoes)
+                            {
+                                <tr>
+                                    <td>@item.DataHora.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td>@item.Descricao</td>
+                                    <td><span class="badge delivered">@item.Titulo</span></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            </div>
+
+        </section>
+
+        <section class="timeline-panel">
             <div class="panel-header">
-                <h2>Histórico de Retiradas</h2>
-                <span>Registros de entregas realizadas.</span>
+                <h2>Linha do Tempo de Eventos</h2>
+                <span>Sequência cronológica das ações vinculadas ao funcionário.</span>
             </div>
 
-            <table>
-                <thead>
-                    <tr>
-                        <th>Data/Hora</th>
-                        <th>Responsável</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
+            @if (!Eventos.Any())
+            {
+                <p>Nenhum evento registrado.</p>
+            }
+            else
+            {
+                <div class="timeline">
+                    @foreach (var item in Eventos)
+                    {
+                        <div class="timeline-item @ObterClasseTimeline(item.Tipo)">
+                            <div class="dot"></div>
 
-                <tbody>
-                    <tr>
-                        <td>16/05/2026 09:40</td>
-                        <td>Administrador Geral</td>
-                        <td><span class="badge success">Confirmada</span></td>
-                    </tr>
-
-                    <tr>
-                        <td>15/04/2026 10:12</td>
-                        <td>Operador Atendimento</td>
-                        <td><span class="badge success">Confirmada</span></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div class="panel">
-            <div class="panel-header">
-                <h2>Histórico de Notificações</h2>
-                <span>Comunicações enviadas ao funcionário.</span>
-            </div>
-
-            <table>
-                <thead>
-                    <tr>
-                        <th>Data/Hora</th>
-                        <th>Canal</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    <tr>
-                        <td>16/05/2026 08:30</td>
-                        <td>WhatsApp</td>
-                        <td><span class="badge delivered">Entregue</span></td>
-                    </tr>
-
-                    <tr>
-                        <td>15/05/2026 14:05</td>
-                        <td>SMS</td>
-                        <td><span class="badge sent">Enviado</span></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-    </section>
-
-    <section class="timeline-panel">
-        <div class="panel-header">
-            <h2>Linha do Tempo de Eventos</h2>
-            <span>Sequência cronológica das ações vinculadas ao funcionário.</span>
-        </div>
-
-        <div class="timeline">
-
-            <div class="timeline-item success">
-                <div class="dot"></div>
-
-                <div class="timeline-content">
-                    <strong>Retirada confirmada</strong>
-                    <p>Cesta básica entregue ao funcionário.</p>
-                    <span>16/05/2026 às 09:40</span>
+                            <div class="timeline-content">
+                                <strong>@item.Titulo</strong>
+                                <p>@item.Descricao</p>
+                                <span>@item.DataHora.ToString("dd/MM/yyyy 'às' HH:mm")</span>
+                            </div>
+                        </div>
+                    }
                 </div>
-            </div>
-
-            <div class="timeline-item delivered">
-                <div class="dot"></div>
-
-                <div class="timeline-content">
-                    <strong>Notificação entregue</strong>
-                    <p>Mensagem enviada por WhatsApp.</p>
-                    <span>16/05/2026 às 08:30</span>
-                </div>
-            </div>
-
-            <div class="timeline-item sent">
-                <div class="dot"></div>
-
-                <div class="timeline-content">
-                    <strong>Notificação enviada</strong>
-                    <p>Comunicação automática registrada no sistema.</p>
-                    <span>15/05/2026 às 14:05</span>
-                </div>
-            </div>
-
-            <div class="timeline-item info">
-                <div class="dot"></div>
-
-                <div class="timeline-content">
-                    <strong>Cadastro atualizado</strong>
-                    <p>Dados cadastrais revisados pela administração.</p>
-                    <span>14/05/2026 às 11:20</span>
-                </div>
-            </div>
-
-        </div>
-    </section>
+            }
+        </section>
+    }
 
 </div>

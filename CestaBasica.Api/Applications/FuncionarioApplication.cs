@@ -13,12 +13,12 @@ public class FuncionarioApplication
         _service = service;
     }
 
-    public async Task<Funcionario> CriarAsync(FuncionarioDto dto)
+    public async Task<FuncionarioDto> CriarAsync(FuncionarioDto dto)
     {
         return await _service.CriarAsync(dto);
     }
 
-    public async Task<List<Funcionario>> ListarAsync()
+    public async Task<List<FuncionarioDto>> ListarAsync()
     {
         return await _service.ListarAsync();
     }
@@ -32,5 +32,21 @@ public class FuncionarioApplication
     {
         await _service.ExcluirAsync(id);
     }
+    public async Task<HistoricoFuncionarioDto> ObterHistoricoAsync(int funcionarioId)
+    {
+        return await _service.ObterHistoricoAsync(funcionarioId);
+    }
+    public async Task<FuncionarioDto?> BuscarPorCodigoAsync(string codigoBarras)
+    {
+        return await _service.BuscarPorCodigoAsync(codigoBarras);
+    }
 
+    public async Task<List<FuncionarioDto>> BuscarManualAsync(string termo)
+    {
+        return await _service.BuscarManualAsync(termo);
+    }
+    public async Task<FuncionarioDto?> BuscarPorIdAsync(int id)
+{
+    return await _service.BuscarPorIdAsync(id);
+}
 }

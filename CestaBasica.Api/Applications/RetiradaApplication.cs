@@ -22,4 +22,14 @@ public class RetiradaApplication
     {
         return await _service.ListarAsync();
     }
+
+    public async Task<List<FuncionarioDto>> ListarRecentesAsync()
+    {
+        return await _service.ListarRecentesAsync();
+    }
+
+    public async Task ConfirmarRetiradaAsync(int funcionarioId)
+    {
+        await _service.ConfirmarRetiradaAsync(funcionarioId);
+    }
 }

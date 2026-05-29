@@ -1,6 +1,8 @@
 @page "/funcionarios"
 @using Microsoft.AspNetCore.Components.Routing
 @using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Components
+
 
 <div class="employees-page">
     <div class="page-header">
@@ -11,51 +13,48 @@
                 <p>Controle administrativo de beneficiários, retiradas e histórico operacional.</p>
             </div>
         </div>
-        <div class="header-actions">
-            <NavLink href="/novo" class="btn-primary">
-                + Novo funcionário
-            </NavLink>
-            <NavLink href="/importacao" class="btn-primary">
-                + Importar funcionários
-            </NavLink>
-        </div>
+        <button class="btn-primary" @onclick='() => Navigation.NavigateTo("/novo")'>
+            ➕ Novo funcionário
+        </button>
+
+        <button class="btn-secondary" @onclick='() => Navigation.NavigateTo("/importacao")'>
+            📥 Importar funcionários
+        </button>
     </div>
     <section class="filters-card">
-        <div class="search-box">
-            <label>Busca rápida</label>
-            <input placeholder="Pesquisar por nome, matrícula ou código de barras..." @bind="termoBusca"
-                   @bind:event="oninput" />
-        </div>
+        <input placeholder="Pesquisar por nome, matrícula ou código de barras..." @bind="termoBusca"
+               @bind:event="oninput" @bind:after="ResetarPagina" />
 
         <div class="filter-group">
             <div>
                 <label>Status</label>
-                <select>
-                    <option>Todos</option>
-                    <option>Retirado</option>
-                    <option>Pendente</option>
+                <select @bind="filtroStatus" @bind:after="ResetarPagina">
+                    <option value="">Todos</option>
+                    <option value="Retirado">Retirado</option>
+                    <option value="Pendente">Pendente</option>
                 </select>
             </div>
 
             <div>
                 <label>Secretaria/Setor</label>
-                <select>
-                    <option>Todos</option>
-                    <option>Assistência Social</option>
-                    <option>Educação</option>
-                    <option>Saúde</option>
-                    <option>Administração</option>
+                <select @bind="filtroSetor" @bind:after="ResetarPagina">
+                    <option value="">Todos</option>
+
+                    @foreach (var setor in setores)
+                    {
+                        <option value="@setor">@setor</option>
+                    }
                 </select>
             </div>
 
             <div>
                 <label>Data inicial</label>
-                <input type="date" />
+                <input type="date" value="@dataInicial" @onchange="FiltrarDataInicial" />
             </div>
 
             <div>
                 <label>Data final</label>
-                <input type="date" />
+                <input type="date" value="@dataFinal" @onchange="FiltrarDataFinal" />
             </div>
         </div>
     </section>
@@ -93,12 +92,12 @@
                             <td>
                                 @if (EditarFuncionarioId == funcionario.Id)
                                 {
-                                    <input class="table-input" @bind="funcionario.Nome" />
+                                    <input class="table-input" @bind="funcionario.NomeCompleto" />
                                 }
                                 else
                                 {
                                     <div class="employee-info">
-                                        <strong>@funcionario.Nome</strong>
+                                        <strong>@funcionario.NomeCompleto</strong>
                                     </div>
                                 }
                             </td>
@@ -216,23 +215,4 @@
             </div>
         </div>
     </section>
-    @if (MostrarHistorico && FuncionarioHistorico is not null)
-    {
-        <div class="modal-overlay">
-            <div class="modal-card">
-                <div class="modal-header">
-                    <h3>Histórico de retirada</h3>
-                    <button type="button" @onclick="FecharHistorico">✖</button>
-                </div>
-
-                <p><strong>Funcionário:</strong> @FuncionarioHistorico.Nome</p>
-                <p><strong>Status:</strong> @FuncionarioHistorico.Status</p>
-
-                <div class="history-box">
-                    <p>📦 Última retirada: informação da API aqui</p>
-                    <p>📅 Próxima retirada: informação da API aqui</p>
-                </div>
-            </div>
-        </div>
-    }
 </div>

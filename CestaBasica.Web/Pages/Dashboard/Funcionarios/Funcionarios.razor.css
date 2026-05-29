@@ -46,27 +46,41 @@
     margin-top: 6px;
 }
 
-.btn-primary,
-.btn-secondary {
-    border: none;
-    border-radius: 14px;
-    height: 46px;
-    padding: 0 22px;
-    font-weight: 800;
+.header-actions {
+    display: flex;
+    gap: 14px;
+    align-items: center;
 }
 
 .btn-primary,
 .btn-secondary {
     border: none;
     border-radius: 14px;
-    min-height: 46px;
     padding: 0 22px;
-    font-weight: 800;
+    height: 46px;
+
+    background: #7b818b;
+    color: white;
+
+    font-weight: 700;
+    font-size: 14px;
     text-decoration: none;
 
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    gap: 8px;
+
+    cursor: pointer;
+    transition:
+        background 0.2s ease,
+        transform 0.15s ease;
+}
+
+.btn-primary:hover,
+.btn-secondary:hover {
+    background: #656b74;
+    transform: translateY(-1px);
 }
 
 .filters-card,
@@ -134,17 +148,28 @@
 
 .table-responsive {
     width: 100%;
+    max-height: 620px;
+    overflow-y: auto;
     overflow-x: auto;
+    position: relative;
+}
+.table-responsive::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
 }
 
+.table-responsive::-webkit-scrollbar-thumb {
+    background: #c7d7f2;
+    border-radius: 999px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+    background: #edf4ff;
+}
 table {
     width: 100%;
     border-collapse: collapse;
     min-width: 980px;
-}
-
-thead {
-    background: #f4f7fb;
 }
 
 th {
@@ -230,6 +255,10 @@ td small {
     background: #005be0;
     color: white;
 }
+.pagination button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
 
 @media (max-width: 1000px) {
     .filter-group {
@@ -254,13 +283,14 @@ td small {
     }
 
     .header-actions {
-        flex-direction: column;
-        width: 100%;
+        flex-direction: row;
+        width: auto;
+        flex-wrap: wrap;
     }
 
     .btn-primary,
     .btn-secondary {
-        width: 100%;
+        width: auto;
     }
 }
 
@@ -294,23 +324,6 @@ td small {
     background: #f3f4f6;
     border-radius: 12px;
 }
-.table-responsive {
-    max-height: 620px;
-    overflow-y: auto;
-    overflow-x: auto;
-    position: relative;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-thead {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-}
 
 thead th {
     background: #003b95;
@@ -321,8 +334,7 @@ thead th {
     padding: 16px;
 }
 
-.table-responsive thead th {
-    position: sticky;
-    top: 0;
-    z-index: 2;
+tbody tr:hover {
+    background: #f8fbff;
+    transition: background 0.2s ease;
 }

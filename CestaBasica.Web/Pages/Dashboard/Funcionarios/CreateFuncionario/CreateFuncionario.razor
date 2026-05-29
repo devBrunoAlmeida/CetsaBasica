@@ -1,7 +1,10 @@
 @page "/novo"
-@using Microsoft.AspNetCore.Components.Routing
-@using Microsoft.AspNetCore.Components.Web
 @using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Components
+
+@using CestaBasica.Shared.DTOs
+
 
 <div class="employee-form-page">
     <div class="page-header">
@@ -10,71 +13,62 @@
             <p>Preencha os dados cadastrais para registrar um novo funcionário no sistema.</p>
         </div>
 
-        <button class="btn-cancel" @onclick="Cancelar">
-            Cancelar
+        <button type="button" class="btn-cancel" @onclick="Cancelar">
+            ← Voltar
         </button>
     </div>
 
-    <EditForm Model="funcionario" OnSubmit="Salvar" FormName="funcionarioForm">
+    <EditForm Model="funcionario" OnValidSubmit="Salvar" FormName="funcionarioForm">
+
         <DataAnnotationsValidator />
+        <ValidationSummary />
 
         <section class="form-card">
-
             <div class="card-header">
                 <h2>Dados do funcionário</h2>
                 <span>Informações principais para identificação e controle.</span>
             </div>
 
             <div class="form-grid">
-
                 <div class="form-group full">
-                    <label>Nome completo</label>
-                    <InputText class="form-control-custom"
-                               @bind-Value="funcionario.NomeCompleto"
-                               placeholder="Digite o nome completo" />
+                    <label for="nome">👤 Nome completo</label>
+                    <InputText id="nome" class="form-control-custom" @bind-Value="funcionario.NomeCompleto"
+                               placeholder="Digite o nome completo" autocomplete="name" />
                     <ValidationMessage For="@(() => funcionario.NomeCompleto)" />
                 </div>
 
                 <div class="form-group">
-                    <label>Matrícula</label>
-                    <InputText class="form-control-custom"
-                               @bind-Value="funcionario.Matricula"
+                    <label for="matricula">🆔 Matrícula</label>
+                    <InputText id="matricula" class="form-control-custom" @bind-Value="funcionario.Matricula"
                                placeholder="Ex: MAT-0001" />
                     <ValidationMessage For="@(() => funcionario.Matricula)" />
                 </div>
 
                 <div class="form-group">
-                    <label>Código de barras</label>
-                    <InputText class="form-control-custom"
-                               @bind-Value="funcionario.CodigoBarras"
+                    <label for="codigoBarras">📦 Código de barras</label>
+                    <InputText id="codigoBarras" class="form-control-custom" @bind-Value="funcionario.CodigoBarras"
                                placeholder="Digite o código de barras" />
                     <ValidationMessage For="@(() => funcionario.CodigoBarras)" />
                 </div>
 
                 <div class="form-group">
-                    <label>Telefone</label>
-                    <InputText class="form-control-custom"
-                               @bind-Value="funcionario.Telefone"
-                               @oninput="FormatarTelefone"
-                               maxlength="15"
-                               placeholder="(15) 99999-9999" />
-                    <ValidationMessage For="@(() => funcionario.Telefone)" />
+                    <label for="telefone">📱 Telefone</label>
+                    <InputText id="telefone" class="form-control-custom" @bind-Value="funcionario.Telefone"
+                               maxlength="15" placeholder="(15) 99999-9999" autocomplete="tel" />
                 </div>
 
                 <div class="form-group">
-                    <label>Secretaria/Setor</label>
-                    <InputSelect class="form-control-custom"
-                                 @bind-Value="funcionario.Setor">
+                    <label for="setor">🏢 Secretaria/Setor</label>
+                    <InputSelect id="setor" class="form-control-custom" @bind-Value="funcionario.Setor">
                         <option value="">Selecione o setor</option>
-                        <option>Administração</option>
-                        <option>Assistência Social</option>
-                        <option>Educação</option>
-                        <option>Saúde</option>
-                        <option>Obras e Serviços</option>
+                        <option value="Administração">Administração</option>
+                        <option value="Assistência Social">Assistência Social</option>
+                        <option value="Educação">Educação</option>
+                        <option value="Saúde">Saúde</option>
+                        <option value="Obras e Serviços">Obras e Serviços</option>
                     </InputSelect>
                     <ValidationMessage For="@(() => funcionario.Setor)" />
                 </div>
-
             </div>
 
             <div class="form-actions">
@@ -83,66 +77,9 @@
                 </button>
 
                 <button type="submit" class="btn-save">
-                    Salvar funcionário
+                    💾 Salvar cadastro
                 </button>
             </div>
-
         </section>
     </EditForm>
-
 </div>
-
-@code {
-    [Inject]
-    public NavigationManager Navigation { get; set; } = default!;
-
-    private FuncionarioCadastroModel funcionario = new();
-
-    private void Salvar()
-    {
-        // Depois ligamos com a API
-        Navigation.NavigateTo("/funcionarios");
-    }
-
-    private void Cancelar()
-    {
-        Navigation.NavigateTo("/funcionarios");
-    }
-
-    private void FormatarTelefone(ChangeEventArgs e)
-    {
-        var numeros = new string((e.Value?.ToString() ?? "")
-            .Where(char.IsDigit)
-            .ToArray());
-
-        if (numeros.Length > 11)
-            numeros = numeros[..11];
-
-        if (numeros.Length <= 2)
-            funcionario.Telefone = numeros;
-        else if (numeros.Length <= 6)
-            funcionario.Telefone = $"({numeros[..2]}) {numeros[2..]}";
-        else if (numeros.Length <= 10)
-            funcionario.Telefone = $"({numeros[..2]}) {numeros[2..6]}-{numeros[6..]}";
-        else
-            funcionario.Telefone = $"({numeros[..2]}) {numeros[2..7]}-{numeros[7..]}";
-    }
-
-    public class FuncionarioCadastroModel
-    {
-        [System.ComponentModel.DataAnnotations.Required(ErrorMessage = "Informe o nome completo.")]
-        public string NomeCompleto { get; set; } = "";
-
-        [System.ComponentModel.DataAnnotations.Required(ErrorMessage = "Informe a matrícula.")]
-        public string Matricula { get; set; } = "";
-
-        [System.ComponentModel.DataAnnotations.Required(ErrorMessage = "Informe o código de barras.")]
-        public string CodigoBarras { get; set; } = "";
-
-        [System.ComponentModel.DataAnnotations.Required(ErrorMessage = "Informe o telefone.")]
-        public string Telefone { get; set; } = "";
-
-        [System.ComponentModel.DataAnnotations.Required(ErrorMessage = "Selecione a secretaria ou setor.")]
-        public string Setor { get; set; } = "";
-    }
-}

@@ -34,7 +34,7 @@ public class ImportacaoService
             {
                 var funcionario = new Funcionario
                 {
-                    Nome = row.Cell(1).GetString(),
+                    NomeCompleto = row.Cell(1).GetString(),
                     Matricula = row.Cell(2).GetString(),
                     CodigoBarras = row.Cell(3).GetString(),
                     Telefone = row.Cell(4).GetString(),

@@ -15,7 +15,7 @@ public class UsuariosController : ControllerBase
         _app = app;
     }
 
-    [HttpPost]
+    [HttpPost("/Criar")]
     public async Task<IActionResult> Criar(UsuarioCreateDto dto)
     {
         try
@@ -37,7 +37,7 @@ public class UsuariosController : ControllerBase
         }
     }
 
-    [HttpGet]
+    [HttpGet("/Listar")]
     public async Task<IActionResult> Listar()
     {
         var result = await _app.ListarAsync();
@@ -52,7 +52,7 @@ public class UsuariosController : ControllerBase
         }));
     }
 
-    [HttpPost("login")]
+    [HttpPost("/login")]
     public async Task<IActionResult> Login(LoginDto dto)
     {
         try
