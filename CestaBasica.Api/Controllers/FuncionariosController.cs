@@ -46,15 +46,15 @@ public class FuncionariosController : ControllerBase
         return Ok(result);
     }
     [HttpGet("{id:int}")]
-public async Task<IActionResult> BuscarPorId(int id)
-{
-    var funcionario = await _app.BuscarPorIdAsync(id);
+    public async Task<IActionResult> BuscarPorId(int id)
+    {
+        var funcionario = await _app.BuscarPorIdAsync(id);
 
-    if (funcionario is null)
-        return NotFound();
+        if (funcionario is null)
+            return NotFound();
 
-    return Ok(funcionario);
-}
+        return Ok(funcionario);
+    }
 
     [HttpGet("{id:int}/historico")]
     public async Task<IActionResult> ObterHistorico(int id)
@@ -78,5 +78,16 @@ public async Task<IActionResult> BuscarPorId(int id)
             return NotFound();
 
         return Ok(funcionario);
+    }
+    [HttpGet("exportar-excel")]
+    public async Task<IActionResult> ExportarExcel()
+    {
+        var arquivo = await _app.ExportarExcelAsync();
+
+        return File(
+            arquivo,
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "funcionarios.xlsx"
+        );
     }
 }

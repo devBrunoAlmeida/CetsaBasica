@@ -103,4 +103,8 @@ public class RetiradaService
 
         await RegistrarRetiradaAsync(dto);
     }
+    public async Task<List<RetiradaRecenteDto>> ListarRecentesDetalhadoAsync()
+{
+    return await _retiradaRepository.ListarRecentesDetalhadoAsync();
+}
 }

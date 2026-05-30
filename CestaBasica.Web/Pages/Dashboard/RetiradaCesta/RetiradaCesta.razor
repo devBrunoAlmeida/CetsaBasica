@@ -23,9 +23,7 @@
 
             <div class="form-group">
                 <label>Código de barras</label>
-                <input class="input-custom"
-                       placeholder="Leia ou digite o código de barras"
-                       value="@codigoBarras"
+                <input class="input-custom" placeholder="Leia ou digite o código de barras" value="@codigoBarras"
                        @oninput="BuscarPorCodigo" />
             </div>
 
@@ -35,9 +33,7 @@
 
             <div class="form-group">
                 <label>Busca manual</label>
-                <input class="input-custom"
-                       placeholder="Pesquisar por nome ou matrícula"
-                       value="@buscaManual"
+                <input class="input-custom" placeholder="Pesquisar por nome ou matrícula" value="@buscaManual"
                        @oninput="BuscarManual" />
             </div>
 
@@ -138,19 +134,21 @@
                         <th>Matrícula</th>
                         <th>Setor</th>
                         <th>Status</th>
+                        <th>Data da Retirada</th>
                     </tr>
                 </thead>
 
                 <tbody>
-                    @if (historico.Any())
+                    @if (historicoRetiradas.Any())
                     {
-                        @foreach (var item in historico)
+                        @foreach (var item in historicoRetiradas)
                         {
                             <tr>
                                 <td>@item.NomeCompleto</td>
                                 <td>@item.Matricula</td>
                                 <td>@item.Setor</td>
                                 <td><span class="badge">@item.Status</span></td>
+                                <td>@item.DataRetirada.ToString("dd/MM/yyyy HH:mm")</td>
                             </tr>
                         }
                     }

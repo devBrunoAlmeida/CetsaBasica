@@ -246,6 +246,7 @@ td {
 }
 
 @media (max-width: 900px) {
+
     .page-header,
     .card-header,
     .history-item {
@@ -269,4 +270,64 @@ td {
     .btn-primary {
         width: 100%;
     }
+}
+
+.btn-primary:disabled {
+    background: linear-gradient(90deg, #93b4e0, #a8c4f5);
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.table-empty {
+    text-align: center;
+    padding: 48px;
+    color: #94a3b8;
+    font-weight: 600;
+}
+
+.file-selected-box {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: #edf4ff;
+    border: 1.5px solid #9ec5fe;
+    border-radius: 16px;
+    padding: 16px 20px;
+    margin-top: 20px;
+    text-align: left;
+}
+
+.file-selected-box strong {
+    color: #002b6b;
+    font-size: 15px;
+}
+
+.file-selected-box p {
+    margin: 4px 0 0;
+    color: #64748b;
+    font-size: 13px;
+}
+
+.file-icon {
+    font-size: 32px;
+}
+
+.btn-remove {
+    margin-left: auto;
+    background: #fee2e2;
+    color: #b91c1c;
+    border: none;
+    border-radius: 999px;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-remove:hover {
+    background: #fca5a5;
 }

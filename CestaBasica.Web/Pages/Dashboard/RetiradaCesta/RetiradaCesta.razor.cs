@@ -15,22 +15,45 @@ public partial class RetiradaCesta
     private string ultimoFuncionario = "";
 
     private FuncionarioDto? funcionarioSelecionado;
-
     private List<FuncionarioDto> resultadosBusca = new();
     private List<FuncionarioDto> historico = new();
 
+    private List<RetiradaRecenteDto> historicoRetiradas = new();
+
     protected override async Task OnInitializedAsync()
-{
-    try
     {
-        historico = await Http.GetFromJsonAsync<List<FuncionarioDto>>("api/retiradas/recentes")
-                   ?? new();
+        await CarregarHistoricoFuncionarios();
+        await CarregarHistoricoRetiradas();
     }
-    catch
+
+    private async Task CarregarHistoricoFuncionarios()
     {
-        historico = new();
+        try
+        {
+            historico = await Http.GetFromJsonAsync<List<FuncionarioDto>>(
+                "api/retiradas/recentes")
+                ?? new();
+        }
+        catch
+        {
+            historico = new();
+        }
     }
-}
+
+    private async Task CarregarHistoricoRetiradas()
+    {
+        try
+        {
+            historicoRetiradas = await Http.GetFromJsonAsync<List<RetiradaRecenteDto>>(
+                "api/retiradas/recentes-detalhado")
+                ?? new();
+        }
+        catch
+        {
+            historicoRetiradas = new();
+        }
+    }
+
 
     private async Task BuscarPorCodigo(ChangeEventArgs e)
     {

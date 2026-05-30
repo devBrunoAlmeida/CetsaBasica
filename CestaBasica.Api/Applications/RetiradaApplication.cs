@@ -32,4 +32,8 @@ public class RetiradaApplication
     {
         await _service.ConfirmarRetiradaAsync(funcionarioId);
     }
+    public async Task<List<RetiradaRecenteDto>> ListarRecentesDetalhadoAsync()
+{
+    return await _service.ListarRecentesDetalhadoAsync();
+}
 }

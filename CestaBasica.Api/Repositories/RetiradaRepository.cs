@@ -1,6 +1,7 @@
 using CestaBasica.Api.Data;
 using CestaBasica.Api.Models;
 using Microsoft.EntityFrameworkCore;
+using CestaBasica.Shared.DTOs;
 
 namespace CestaBasica.Api.Repositories;
 
@@ -53,4 +54,21 @@ public class RetiradaRepository
             .Take(10)
             .ToListAsync();
     }
+
+    public async Task<List<RetiradaRecenteDto>> ListarRecentesDetalhadoAsync()
+{
+    return await _context.Retiradas
+        .Include(x => x.Funcionario)
+        .OrderByDescending(x => x.DataRetirada)
+        .Take(30)
+        .Select(x => new RetiradaRecenteDto
+        {
+            NomeCompleto = x.Funcionario.NomeCompleto,
+            Matricula = x.Funcionario.Matricula,
+            Setor = x.Funcionario.Setor,
+            Status = "Retirado",
+            DataRetirada = x.DataRetirada
+        })
+        .ToListAsync();
+}
 }

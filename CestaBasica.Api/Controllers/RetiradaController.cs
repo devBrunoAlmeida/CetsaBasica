@@ -56,4 +56,11 @@ public class RetiradasController : ControllerBase
             return BadRequest(new { mensagem = ex.Message });
         }
     }
+    
+    [HttpGet("recentes-detalhado")]
+    public async Task<IActionResult> ListarRecentesDetalhado()
+    {
+        var result = await _app.ListarRecentesDetalhadoAsync();
+        return Ok(result);
+    }
 }

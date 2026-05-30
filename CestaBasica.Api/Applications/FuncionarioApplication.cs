@@ -46,7 +46,11 @@ public class FuncionarioApplication
         return await _service.BuscarManualAsync(termo);
     }
     public async Task<FuncionarioDto?> BuscarPorIdAsync(int id)
-{
-    return await _service.BuscarPorIdAsync(id);
-}
+    {
+        return await _service.BuscarPorIdAsync(id);
+    }
+    public async Task<byte[]> ExportarExcelAsync()
+    {
+        return await _service.ExportarExcelAsync();
+    }
 }

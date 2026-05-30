@@ -8,12 +8,17 @@ public class ImportacaoApplication
     private readonly ImportacaoService _service;
 
     public ImportacaoApplication(ImportacaoService service)
+        => _service = service;
+
+    public Task<ImportacaoResultadoDto> ImportarFuncionariosAsync(IFormFile arquivo)
     {
-        _service = service;
+        var stream = arquivo.OpenReadStream();
+        return _service.ImportarAsync(stream, arquivo.FileName);
     }
 
-    public async Task<ImportacaoResultadoDto> ImportarFuncionariosAsync(IFormFile arquivo)
-    {
-        return await _service.ImportarFuncionariosAsync(arquivo);
-    }
+    public async Task<List<HistoricoImportacaoDto>> ObterHistoricoAsync()
+{
+    return await _service.ObterHistoricoAsync();
+}
+    
 }

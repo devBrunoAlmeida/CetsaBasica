@@ -22,8 +22,16 @@
         </button>
     </div>
     <section class="filters-card">
-        <input placeholder="Pesquisar por nome, matrícula ou código de barras..." @bind="termoBusca"
-               @bind:event="oninput" @bind:after="ResetarPagina" />
+        <div class="search-box">
+            <label>Pesquisar funcionário</label>
+
+            <div class="search-input">
+                <span>🔎</span>
+
+                <input placeholder="Pesquisar por nome, matrícula ou código de barras..." @bind="termoBusca"
+                       @bind:event="oninput" @bind:after="ResetarPagina" />
+            </div>
+        </div>
 
         <div class="filter-group">
             <div>
@@ -68,7 +76,9 @@
                 </span>
             </div>
 
-            <button class="btn-secondary">Exportar</button>
+            <button class="btn-secondary" @onclick="ExportarExcel">
+                Exportar Excel
+            </button>
         </div>
 
         <div class="table-responsive">

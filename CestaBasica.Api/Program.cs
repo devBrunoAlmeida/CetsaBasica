@@ -34,6 +34,7 @@ builder.Services.AddScoped<CestaRepository>();
 builder.Services.AddScoped<NotificacaoRepository>();
 builder.Services.AddScoped<DashboardRepository>();
 builder.Services.AddScoped<UsuarioRepository>();
+builder.Services.AddScoped<HistoricoImportacaoRepository>();
 #endregion
 
 #region Applications

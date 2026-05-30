@@ -1,5 +1,10 @@
 @page "/importacao"
+@namespace CestaBasica.Web.Pages.Dashboard.Funcionarios.ImportacaoFuncionarios
+@using Microsoft.AspNetCore.Components
 @using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Components.Routing
+@using CestaBasica.Shared.DTOs
 
 <div class="import-page">
 
@@ -8,28 +13,34 @@
             <h1>Importação de Planilhas</h1>
             <p>Carregue arquivos Excel ou CSV para cadastro e atualização de registros no sistema.</p>
         </div>
-
-        <button class="btn-secondary">Gerar relatório</button>
     </div>
 
     <section class="upload-card">
         <div class="upload-area">
-            <div class="upload-icon">📄</div>
 
-            <h2>Arraste e solte sua planilha aqui</h2>
-            <p>Formatos aceitos: Excel (.xlsx, .xls) e CSV (.csv)</p>
+            <div style="@(arquivoSelecionado is null ? "" : "display:none")">
+                <div class="upload-icon">📄</div>
+                <h2>Arraste e solte sua planilha aqui</h2>
+                <p>Formatos aceitos: Excel (.xlsx, .xls) e CSV (.csv)</p>
+                <label class="btn-upload">
+                    Selecionar arquivo
+                    <InputFile OnChange="SelecionarArquivo" accept=".xlsx,.xls,.csv" />
+                </label>
+            </div>
 
-            <label class="btn-upload">
-                Selecionar arquivo
-                <InputFile OnChange="SelecionarArquivo" accept=".xlsx,.xls,.csv" />
-            </label>
-
-            @if (!string.IsNullOrEmpty(nomeArquivo))
-            {
-                <div class="file-selected">
-                    Arquivo selecionado: <strong>@nomeArquivo</strong>
+            <div style="@(arquivoSelecionado is not null ? "" : "display:none")">
+                <div class="upload-icon">✅</div>
+                <h2>Arquivo pronto para importação</h2>
+                <div class="file-selected-box">
+                    <span class="file-icon">📊</span>
+                    <div>
+                        <strong>@nomeArquivo</strong>
+                        <p>Clique em "Importar registros válidos" para processar</p>
+                    </div>
+                    <button class="btn-remove" @onclick="RemoverArquivo">✕</button>
                 </div>
-            }
+            </div>
+
         </div>
     </section>
 
@@ -38,12 +49,10 @@
             <span>Registros válidos</span>
             <h2>@validos</h2>
         </div>
-
         <div class="summary-card danger">
             <span>Registros inválidos</span>
             <h2>@invalidos</h2>
         </div>
-
         <div class="summary-card neutral">
             <span>Total analisado</span>
             <h2>@total</h2>
@@ -56,9 +65,8 @@
                 <h2>Pré-visualização da planilha</h2>
                 <span>Validação automática dos dados antes da importação.</span>
             </div>
-
-            <button class="btn-primary" @onclick="ImportarRegistrosValidos">
-                Importar registros válidos
+            <button class="btn-primary" @onclick="ImportarRegistrosValidos" disabled="@importando">
+                @(importando ? "Importando..." : "Importar registros válidos")
             </button>
         </div>
 
@@ -69,7 +77,6 @@
                     <span>Importando registros...</span>
                     <strong>@progresso%</strong>
                 </div>
-
                 <div class="progress-bar">
                     <div style="width:@progresso%"></div>
                 </div>
@@ -90,9 +97,16 @@
                         <th>Erros</th>
                     </tr>
                 </thead>
-
                 <tbody>
-                    @foreach (var item in registros)
+                    @if (!registros.Any())
+                    {
+                        <tr>
+                            <td colspan="8" class="table-empty">
+                                Nenhum arquivo carregado ainda.
+                            </td>
+                        </tr>
+                    }
+                    @foreach (RegistroImportacaoDto item in registros)
                     {
                         <tr class="@(item.Valido ? "" : "invalid-row")">
                             <td>@item.Linha</td>
@@ -121,79 +135,18 @@
                 <span>Controle das últimas operações realizadas.</span>
             </div>
         </div>
-
         <div class="history-list">
             @foreach (var item in historico)
             {
                 <div class="history-item">
                     <div>
-                        <strong>@item.Arquivo</strong>
-                        <p>@item.Data - @item.Usuario</p>
+                        <strong>@item.NomeArquivo</strong>
+                        <p>@item.DataImportacao.ToString("dd/MM/yyyy HH:mm") - @item.Usuario</p>
                     </div>
-
-                    <span>@item.Registros registros</span>
+                    <span>@item.QuantidadeRegistros registros</span>
                 </div>
             }
         </div>
     </section>
 
 </div>
-
-@code {
-    private string nomeArquivo = "";
-    private int progresso = 0;
-
-    private List<RegistroImportacao> registros = new()
-    {
-        new(2, "Maria Oliveira", "MAT-001", "789456123001", "(15) 99999-1001", "Educação", true, "-"),
-        new(3, "João Santos", "", "789456123002", "(15) 99999-1002", "Saúde", false, "Matrícula obrigatória"),
-        new(4, "Ana Lima", "MAT-003", "789456123003", "(15) 99999-1003", "Assistência Social", true, "-"),
-        new(5, "", "MAT-004", "789456123004", "(15) 99999-1004", "Administração", false, "Nome obrigatório")
-    };
-
-    private List<HistoricoImportacao> historico = new()
-    {
-        new("funcionarios_maio.xlsx", "16/05/2026 09:30", "Administrador", 124),
-        new("atualizacao_setores.csv", "15/05/2026 14:10", "Operador", 86),
-        new("base_funcionarios.xlsx", "14/05/2026 10:45", "Administrador", 210)
-    };
-
-    private int validos => registros.Count(x => x.Valido);
-    private int invalidos => registros.Count(x => !x.Valido);
-    private int total => registros.Count;
-
-    private void SelecionarArquivo(InputFileChangeEventArgs e)
-    {
-        nomeArquivo = e.File.Name;
-        progresso = 0;
-    }
-
-    private async Task ImportarRegistrosValidos()
-    {
-        progresso = 0;
-
-        for (int i = 0; i <= 100; i += 20)
-        {
-            progresso = i;
-            await Task.Delay(250);
-        }
-    }
-
-    public record RegistroImportacao(
-        int Linha,
-        string Nome,
-        string Matricula,
-        string CodigoBarras,
-        string Telefone,
-        string Setor,
-        bool Valido,
-        string Erro
-    );
-
-    public record HistoricoImportacao(
-        string Arquivo,
-        string Data,
-        string Usuario,
-        int Registros
-    );
-}

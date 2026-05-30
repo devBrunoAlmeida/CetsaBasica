@@ -1,6 +1,7 @@
 using CestaBasica.Api.Models;
 using CestaBasica.Api.Repositories;
 using CestaBasica.Shared.DTOs;
+using OfficeOpenXml;
 
 namespace CestaBasica.Api.Services;
 
@@ -157,23 +158,55 @@ public class FuncionarioService
         }).ToList();
     }
     public async Task<FuncionarioDto?> BuscarPorIdAsync(int id)
-{
-    var funcionario = await _funcionarioRepository.BuscarPorIdAsync(id);
-
-    if (funcionario is null)
-        return null;
-
-    var historico = await ObterHistoricoAsync(funcionario.Id);
-
-    return new FuncionarioDto
     {
-        Id = funcionario.Id,
-        NomeCompleto = funcionario.NomeCompleto,
-        Matricula = funcionario.Matricula,
-        CodigoBarras = funcionario.CodigoBarras,
-        Telefone = funcionario.Telefone,
-        Setor = funcionario.Setor,
-        Status = historico.Status
-    };
-}
+        var funcionario = await _funcionarioRepository.BuscarPorIdAsync(id);
+
+        if (funcionario is null)
+            return null;
+
+        var historico = await ObterHistoricoAsync(funcionario.Id);
+
+        return new FuncionarioDto
+        {
+            Id = funcionario.Id,
+            NomeCompleto = funcionario.NomeCompleto,
+            Matricula = funcionario.Matricula,
+            CodigoBarras = funcionario.CodigoBarras,
+            Telefone = funcionario.Telefone,
+            Setor = funcionario.Setor,
+            Status = historico.Status
+        };
+    }
+    public async Task<byte[]> ExportarExcelAsync()
+    {
+        var funcionarios = await _funcionarioRepository.ListarAsync();
+
+        using var package = new ExcelPackage();
+        var sheet = package.Workbook.Worksheets.Add("Funcionários");
+
+        sheet.Cells[1, 1].Value = "Nome";
+        sheet.Cells[1, 2].Value = "Matrícula";
+        sheet.Cells[1, 3].Value = "Código de Barras";
+        sheet.Cells[1, 4].Value = "Telefone";
+        sheet.Cells[1, 5].Value = "Setor";
+        sheet.Cells[1, 6].Value = "Status";
+
+        int linha = 2;
+
+        foreach (var f in funcionarios)
+        {
+            sheet.Cells[linha, 1].Value = f.NomeCompleto;
+            sheet.Cells[linha, 2].Value = f.Matricula;
+            sheet.Cells[linha, 3].Value = f.CodigoBarras;
+            sheet.Cells[linha, 4].Value = f.Telefone;
+            sheet.Cells[linha, 5].Value = f.Setor;
+            sheet.Cells[linha, 6].Value = f.Status;
+
+            linha++;
+        }
+
+        sheet.Cells.AutoFitColumns();
+
+        return package.GetAsByteArray();
+    }
 }

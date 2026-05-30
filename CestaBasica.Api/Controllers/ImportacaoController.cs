@@ -24,4 +24,11 @@ public class ImportacaoController : ControllerBase
 
         return Ok(resultado);
     }
+
+    [HttpGet("historico")]
+    public async Task<IActionResult> ObterHistorico()
+    {
+        var resultado = await _app.ObterHistoricoAsync();
+        return Ok(resultado);
+    }
 }
