@@ -84,17 +84,27 @@
     display: flex;
     gap: 12px;
     align-items: center;
+    background: white;
+    padding: 16px;
+    border-radius: 18px;
+    box-shadow: 0 8px 20px rgba(0,43,107,.08);
 }
 
-.filters input,
-.filters button {
-    height: 42px;
-    border-radius: 12px;
-    border: 1px solid #d6e1f0;
+.filters input[type="date"] {
+    width: 180px;
+    min-width: 180px;
+    height: 44px;
     padding: 0 14px;
+    border: 1px solid #d6e1f0;
+    border-radius: 12px;
+    background: white;
 }
 
 .filters button {
+    height: 44px;
+    padding: 0 22px;
+    border: none;
+    border-radius: 12px;
     background: #005be0;
     color: white;
     font-weight: 700;
@@ -363,4 +373,31 @@ td {
         opacity: 1;
         transform: translateX(0);
     }
+}
+
+.user-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.user-actions span {
+    font-weight: 700;
+    color: #002b6b;
+}
+
+.btn-logout {
+    border: none;
+    background: #dc3545;
+    color: white;
+    height: 42px;
+    padding: 0 18px;
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: .2s;
+}
+
+.btn-logout:hover {
+    background: #bb2d3b;
 }

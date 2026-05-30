@@ -1,11 +1,12 @@
 @page "/login"
 
-@using CestaBasica.Web.Components.Layout
-@layout EmptyLayout
-@namespace CestaBasica.Web.Pages.Login
 @using CestaBasica.Web.Models.Requests
+@using CestaBasica.Web.Components.Layout
+@using CestaBasica.Shared.Enums
 @using CestaBasica.Web.Services
 @using Microsoft.AspNetCore.Components.Forms
+
+@layout EmptyLayout
 
 @inject UsuarioApiService UsuarioService
 @inject NavigationManager Navigation
@@ -55,23 +56,6 @@
 
     <div class="login-right">
 
-        <div class="top-options">
-
-            <div class="tipo-usuario">
-                <label>Tipo de Usuário</label>
-
-                <select class="form-select">
-                    <option>Administrador</option>
-                    <option>Usuário Comum</option>
-                </select>
-            </div>
-
-            <button class="contrast-btn">
-                Alto Contraste
-            </button>
-
-        </div>
-
         <div class="login-card">
 
             <div class="logo-area">
@@ -88,51 +72,29 @@
 
             </div>
 
-            <EditForm Model="login"
-                      OnSubmit="FazerLogin"
-                      FormName="loginForm">
+            <EditForm Model="login" OnValidSubmit="FazerLogin" FormName="loginForm">
 
-                <div class="mb-4">
+                <div class="tipo-usuario mb-4">
+                    <label class="tipo-label">Tipo de Usuário</label>
 
-                    <label class="form-label">
-                        E-mail
-                    </label>
-
-                    <InputText class="form-control input-custom"
-                               @bind-Value="login.Email" />
-
+                    <InputSelect class="perfil-select" @bind-Value="login.Perfil">
+                        <option value="@PerfilUsuario.Admin">🛡️ Administrador</option>
+                        <option value="@PerfilUsuario.Usuario">👤 Usuário</option>
+                    </InputSelect>
                 </div>
 
                 <div class="mb-4">
-
-                    <label class="form-label">
-                        Senha
-                    </label>
-
-                    <InputText type="password"
-                               class="form-control input-custom"
-                               @bind-Value="login.Senha" />
-
+                    <label class="form-label">E-mail</label>
+                    <InputText class="form-control input-custom" @bind-Value="login.Email" />
                 </div>
 
-                <div class="login-options">
-
-                    <div>
-                        <input type="checkbox" />
-                        <span>Lembrar-me</span>
-                    </div>
-
-                    <a href="#">
-                        Esqueci minha senha
-                    </a>
-
+                <div class="mb-4">
+                    <label class="form-label">Senha</label>
+                    <InputText type="password" class="form-control input-custom" @bind-Value="login.Senha" />
                 </div>
 
-                <button type="submit"
-                        class="btn-login">
-
+                <button type="submit" class="btn-login">
                     Entrar
-
                 </button>
 
             </EditForm>
@@ -142,6 +104,8 @@
                 <div class="alert alert-danger mt-4">
                     @mensagem
                 </div>
+
+               
             }
 
             <div class="security-text">
@@ -153,38 +117,3 @@
     </div>
 
 </div>
-
-@code {
-
-    private LoginRequest login = new();
-
-    private string mensagem = "";
-
-    private void FazerLogin()
-    {
-        Navigation.NavigateTo("/dashboard");
-    }
-
-    @*private async Task FazerLogin()
-     {
-        try
-        {
-            mensagem = "";
-
-            var response = await UsuarioService.LoginAsync(login);
-
-            if (response != null)
-            {
-                Navigation.NavigateTo("/dashboard");
-            }
-            else
-            {
-                mensagem = "Credenciais inválidas. Verifique as informações e tente novamente.";
-            }
-        }
-        catch
-        {
-            mensagem = "Não foi possível realizar a autenticação no momento.";
-        }
-    } *@
-}

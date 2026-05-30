@@ -1,17 +1,26 @@
 ﻿@inherits LayoutComponentBase
 @using Microsoft.AspNetCore.Components.Routing
+@using CestaBasica.Web.Services
+@inject SessaoUsuarioService Sessao
 
 <div class="app-layout">
 
     <aside class="sidebar @(menuAberto ? "" : "collapsed")">
 
         <div class="sidebar-header">
-            <div class="logo">🧺</div>
+
+            <div class="logo">
+                🧺
+            </div>
 
             @if (menuAberto)
             {
-                <span>Gestão Social</span>
+                <div class="sidebar-user">
+                    <strong>@Sessao.UsuarioLogado?.Nome</strong>
+                    <small>@Sessao.UsuarioLogado?.Perfil</small>
+                </div>
             }
+
         </div>
 
         <button class="toggle-btn" @onclick="AlternarMenu">
@@ -34,23 +43,51 @@
             </NavLink>
 
             <NavLink href="/notificacoes">
-                <span>🔔 Notificações</span>  
+                <span>🔔 Notificações</span>
             </NavLink>
 
-            <NavLink href="/usuarios">
-                <span>🛡️ Usuários</span>
-            </NavLink>
+            @if (Sessao.IsAdmin)
+            {
+                <NavLink href="/usuarios">
+                    <span>👤 Usuários</span>
+                </NavLink>
 
-            <NavLink href="/configuracoes">
-                <span>⚙️ Configurações</span>
-            </NavLink>
+                <NavLink href="/configuracoes">
+                    <span>⚙️ Configurações</span>
+                </NavLink>
+            }
+            <a href="#" class="nav-logout" @onclick="AbrirModalSair">
+                <span>🚪 Sair</span>
+            </a>
         </nav>
 
+        
     </aside>
 
     <main class="page-content">
         @Body
     </main>
+    @if (mostrarModalSair)
+    {
+        <div class="modal-logout-overlay">
+            <div class="modal-logout">
+                <div class="modal-icon">🚪</div>
+
+                <h3>Deseja realmente sair?</h3>
+                <p>Sua sessão será encerrada.</p>
+
+                <div class="modal-actions">
+                    <button class="btn-cancel" @onclick="FecharModalSair">
+                        Cancelar
+                    </button>
+
+                    <button class="btn-confirm" @onclick="ConfirmarLogout">
+                        Sim, sair
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
 
 </div>
 
@@ -61,10 +98,34 @@
 </div>
 
 @code {
+    [Inject]
+    private NavigationManager Navigation { get; set; } = default!;
     private bool menuAberto = true;
 
     private void AlternarMenu()
     {
         menuAberto = !menuAberto;
+    }
+    private void Logout()
+    {
+        Navigation.NavigateTo("/login", true);
+    }
+
+    private bool mostrarModalSair = false;
+
+    private void AbrirModalSair()
+    {
+        mostrarModalSair = true;
+    }
+
+    private void FecharModalSair()
+    {
+        mostrarModalSair = false;
+    }
+
+    private void ConfirmarLogout()
+    {
+        Sessao.Logout();
+        Navigation.NavigateTo("/login");
     }
 }

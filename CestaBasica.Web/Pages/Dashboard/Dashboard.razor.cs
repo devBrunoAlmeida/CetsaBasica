@@ -7,7 +7,8 @@ namespace CestaBasica.Web.Pages.Dashboard;
 
 public partial class Dashboard : ComponentBase
 {
-  
+    [Inject]
+    private NavigationManager Navigation { get; set; } = default!;
     [Inject] protected HttpClient Http { get; set; } = null!;
     protected bool menuAberto = true;
     protected DashboardDto? dashboard;
@@ -23,21 +24,21 @@ public partial class Dashboard : ComponentBase
     }
 
     private async Task MostrarErro(string mensagem)
-{
-    mensagemErro = mensagem;
-    segundosRestantes = 5;
-    StateHasChanged();
-
-    while (segundosRestantes > 0)
     {
-        await Task.Delay(1000);
-        segundosRestantes--;
+        mensagemErro = mensagem;
+        segundosRestantes = 5;
+        StateHasChanged();
+
+        while (segundosRestantes > 0)
+        {
+            await Task.Delay(1000);
+            segundosRestantes--;
+            StateHasChanged();
+        }
+
+        mensagemErro = null;
         StateHasChanged();
     }
-
-    mensagemErro = null;
-    StateHasChanged();
-}
     protected async Task CarregarDashboard()
     {
         carregando = true;
@@ -90,5 +91,5 @@ public partial class Dashboard : ComponentBase
     {
         menuAberto = !menuAberto;
     }
-    
+
 }

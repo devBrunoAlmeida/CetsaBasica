@@ -21,10 +21,10 @@ public class UsuarioRepository
     }
 
     public async Task<Usuario?> BuscarPorEmailAsync(string email)
-    {
-        return await _context.Usuarios
-            .FirstOrDefaultAsync(u => u.Email == email);
-    }
+{
+    return await _context.Usuarios
+        .FirstOrDefaultAsync(x => x.Email == email);
+}
 
     public async Task<List<Usuario>> ListarAsync()
     {

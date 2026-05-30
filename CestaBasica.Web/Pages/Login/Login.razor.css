@@ -196,3 +196,47 @@
         padding: 28px;
     }
 }
+.perfil-select {
+    width: 100%;
+    padding: 14px 18px;
+    border: 1px solid #d9e2ef;
+    border-radius: 14px;
+    background: #fff;
+    color: #1f2937;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.25s ease;
+
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    background-image:
+        linear-gradient(45deg, transparent 50%, #4b5563 50%),
+        linear-gradient(135deg, #4b5563 50%, transparent 50%);
+    background-position:
+        calc(100% - 20px) calc(50% - 3px),
+        calc(100% - 14px) calc(50% - 3px);
+    background-size: 6px 6px;
+    background-repeat: no-repeat;
+}
+
+.perfil-select:hover {
+    border-color: #3b82f6;
+}
+
+.perfil-select:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+}
+
+.tipo-label {
+    display: block;
+    margin-bottom: 8px;
+    color: #374151;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: .3px;
+}

@@ -1,3 +1,5 @@
+using CestaBasica.Shared.Enums;
+
 namespace CestaBasica.Web.Models.Responses;
 
 public class LoginResponse

@@ -1,3 +1,4 @@
+using BCrypt.Net;
 using CestaBasica.Api.Models;
 using CestaBasica.Api.Repositories;
 using CestaBasica.Shared.DTOs;
@@ -24,9 +25,10 @@ public class UsuarioService
         if (string.IsNullOrWhiteSpace(dto.Senha))
             throw new Exception("Senha é obrigatória.");
 
-        var existe = await _repo.BuscarPorEmailAsync(dto.Email);
+        var usuarioExistente =
+            await _repo.BuscarPorEmailAsync(dto.Email);
 
-        if (existe != null)
+        if (usuarioExistente != null)
             throw new Exception("Já existe usuário com este e-mail.");
 
         var usuario = new Usuario
@@ -34,7 +36,8 @@ public class UsuarioService
             Nome = dto.Nome,
             Email = dto.Email,
             SenhaHash = BCrypt.Net.BCrypt.HashPassword(dto.Senha),
-            Perfil = dto.Perfil
+            Perfil = dto.Perfil,
+            Ativo = true
         };
 
         return await _repo.CriarAsync(usuario);
@@ -47,18 +50,23 @@ public class UsuarioService
 
     public async Task<Usuario> LoginAsync(LoginDto dto)
     {
-        var usuario = await _repo.BuscarPorEmailAsync(dto.Email);
+        var usuario =
+            await _repo.BuscarPorEmailAsync(dto.Email);
 
         if (usuario == null)
             throw new Exception("Usuário ou senha inválidos.");
 
-        var senhaValida = BCrypt.Net.BCrypt.Verify(dto.Senha, usuario.SenhaHash);
+        var senhaValida =
+            BCrypt.Net.BCrypt.Verify(dto.Senha, usuario.SenhaHash);
 
         if (!senhaValida)
             throw new Exception("Usuário ou senha inválidos.");
 
         if (!usuario.Ativo)
             throw new Exception("Usuário inativo.");
+
+        if (usuario.Perfil != dto.Perfil)
+            throw new Exception("Perfil inválido.");
 
         return usuario;
     }

@@ -3,10 +3,13 @@ using CestaBasica.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
+
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 builder.Services.AddScoped<UsuarioApiService>();
+builder.Services.AddScoped<SessaoUsuarioService>();
 
 builder.Services.AddScoped(sp =>
     new HttpClient
