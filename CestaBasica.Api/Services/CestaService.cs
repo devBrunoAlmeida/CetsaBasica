@@ -1,5 +1,6 @@
 using CestaBasica.Api.Models;
 using CestaBasica.Api.Repositories;
+using CestaBasica.Shared.DTOs;
 
 namespace CestaBasica.Api.Services;
 
@@ -42,6 +43,33 @@ public class CestaService
             throw new Exception("Cesta já está desativada.");
 
         cesta.Ativa = false;
+
+        await _repository.AtualizarAsync(cesta);
+    }
+    public async Task AtualizarAsync(CestaDto dto)
+    {
+        var cesta = await _repository.ObterPorIdAsync(dto.Id);
+
+        if (cesta == null)
+            throw new Exception("Cesta não encontrada.");
+
+        cesta.Nome = dto.Nome;
+        cesta.Descricao = dto.Descricao;
+        cesta.QuantidadeDisponivel = dto.QuantidadeDisponivel;
+
+        await _repository.AtualizarAsync(cesta);
+    }
+    public async Task AtivarAsync(int id)
+    {
+        var cesta = await _repository.ObterPorIdAsync(id);
+
+        if (cesta is null)
+            throw new Exception("Cesta não encontrada.");
+
+        if (cesta.Ativa)
+            throw new Exception("Cesta já está ativa.");
+
+        cesta.Ativa = true;
 
         await _repository.AtualizarAsync(cesta);
     }

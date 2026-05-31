@@ -9,12 +9,14 @@ public class AppDbContext : DbContext
     {
     }
 
-    public DbSet<HistoricoImportacao> HistoricoImportacoes { get; set; }
+
     public DbSet<Funcionario> Funcionarios { get; set; }
     public DbSet<Cesta> Cestas { get; set; }
     public DbSet<Retirada> Retiradas { get; set; }
     public DbSet<Notificacao> Notificacoes { get; set; }
     public DbSet<Usuario> Usuarios { get; set; }
+    public DbSet<HistoricoImportacao> HistoricoImportacoes { get; set; }
+    public DbSet<Configuracoes> ConfiguracoesSistema { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -26,5 +28,6 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Retirada>().ToTable("retiradas");
         modelBuilder.Entity<Notificacao>().ToTable("notificacoes");
         modelBuilder.Entity<Usuario>().ToTable("usuarios");
+        modelBuilder.Entity<Configuracoes>().ToTable("configuracao_sistema");
     }
 }

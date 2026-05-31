@@ -44,4 +44,12 @@ public class CestaApplication
     {
         await _service.DesativarAsync(id);
     }
+    public async Task AtualizarAsync(CestaDto dto)
+    {
+        await _service.AtualizarAsync(dto);
+    }
+    public async Task AtivarAsync(int id)
+    {
+        await _service.AtivarAsync(id);
+    }
 }

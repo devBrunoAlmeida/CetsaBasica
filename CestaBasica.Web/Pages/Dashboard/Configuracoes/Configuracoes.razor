@@ -1,6 +1,6 @@
 @page "/configuracoes"
-@using Microsoft.AspNetCore.Components.Routing
-@using Microsoft.AspNetCore.Components.Web
+@using CestaBasica.Shared.DTOs
+
 <div class="settings-page">
     <div class="page-header">
         <div>
@@ -8,10 +8,19 @@
             <p>Gerencie parâmetros operacionais, segurança, notificações e auditoria da plataforma.</p>
         </div>
 
-        <button class="btn-primary">
-            Salvar alterações
+        <button class="btn-primary"
+                @onclick="SalvarConfiguracoes"
+                disabled="@salvando">
+            @(salvando ? "Salvando..." : "Salvar alterações")
         </button>
     </div>
+
+    @if (!string.IsNullOrWhiteSpace(mensagem))
+    {
+        <div class="alert-success">
+            @mensagem
+        </div>
+    }
 
     <section class="settings-grid">
 
@@ -20,9 +29,20 @@
             <h2>Canais de Notificação</h2>
             <p>Configure os canais utilizados para comunicação com funcionários.</p>
 
-            <label><input type="checkbox" checked /> WhatsApp habilitado</label>
-            <label><input type="checkbox" checked /> SMS habilitado</label>
-            <label><input type="checkbox" /> Envio automático de lembretes</label>
+            <label>
+                <input type="checkbox" @bind="config.WhatsAppHabilitado" />
+                WhatsApp habilitado
+            </label>
+
+            <label>
+                <input type="checkbox" @bind="config.SmsHabilitado" />
+                SMS habilitado
+            </label>
+
+            <label>
+                <input type="checkbox" @bind="config.EnvioAutomaticoLembretes" />
+                Envio automático de lembretes
+            </label>
         </div>
 
         <div class="settings-card">
@@ -32,14 +52,17 @@
 
             <div class="form-group">
                 <label>Tempo de sessão</label>
-                <select>
-                    <option>30 minutos</option>
-                    <option>1 hora</option>
-                    <option>2 horas</option>
+                <select @bind="config.TempoSessaoMinutos">
+                    <option value="30">30 minutos</option>
+                    <option value="60">1 hora</option>
+                    <option value="120">2 horas</option>
                 </select>
             </div>
 
-            <label><input type="checkbox" checked /> Encerrar sessão por inatividade</label>
+            <label>
+                <input type="checkbox" @bind="config.EncerrarPorInatividade" />
+                Encerrar sessão por inatividade
+            </label>
         </div>
 
         <div class="settings-card">
@@ -49,14 +72,16 @@
 
             <div class="form-group">
                 <label>Frequência</label>
-                <select>
-                    <option>Diário</option>
-                    <option>Semanal</option>
-                    <option>Mensal</option>
+                <select @bind="config.FrequenciaBackup">
+                    <option value="Diario">Diário</option>
+                    <option value="Semanal">Semanal</option>
+                    <option value="Mensal">Mensal</option>
                 </select>
             </div>
 
-            <button class="btn-secondary">Executar backup agora</button>
+            <button class="btn-secondary" type="button">
+                Executar backup agora
+            </button>
         </div>
 
         <div class="settings-card">
@@ -64,8 +89,10 @@
             <h2>Usuários</h2>
             <p>Defina políticas de acesso, perfis e permissões administrativas.</p>
 
-            <label><input type="checkbox" checked /> Permitir cadastro de operadores</label>
-            <label><input type="checkbox" /> Exigir aprovação de administrador</label>
+            <label>
+                <input type="checkbox" @bind="config.PermitirCadastroOperadores" />
+                Permitir cadastro de operadores
+            </label>
         </div>
 
         <div class="settings-card">
@@ -73,9 +100,15 @@
             <h2>Segurança</h2>
             <p>Gerencie regras de autenticação e proteção dos dados.</p>
 
-            <label><input type="checkbox" checked /> Autenticação segura</label>
-            <label><input type="checkbox" checked /> Bloqueio após tentativas inválidas</label>
-            <label><input type="checkbox" /> Autenticação em duas etapas</label>
+            <label>
+                <input type="checkbox" checked disabled />
+                Autenticação segura
+            </label>
+
+            <label>
+                <input type="checkbox" @bind="config.BloqueioTentativasInvalidas" />
+                Bloqueio após tentativas inválidas
+            </label>
         </div>
 
         <div class="settings-card logs-card">
@@ -102,5 +135,4 @@
         </div>
 
     </section>
-
 </div>

@@ -231,3 +231,13 @@
         display: flex;
     }
 }
+.nav-logout {
+    width: 100%;
+    border: none;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    text-align: left;
+    padding: 12px 16px;
+    font: inherit;
+}

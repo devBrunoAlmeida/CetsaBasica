@@ -61,27 +61,70 @@
                     @foreach (var cesta in cestas)
                     {
                         <tr>
-                            <td><strong>@cesta.Nome</strong></td>
-                            <td>@cesta.Descricao</td>
-                            <td>@cesta.QuantidadeDisponivel</td>
-                            <td>@cesta.DataCriacao.ToString("dd/MM/yyyy")</td>
-                            <td>
-                                <span class="badge @(cesta.Ativa ? "success" : "danger")">
-                                    @(cesta.Ativa ? "Ativa" : "Desativada")
-                                </span>
-                            </td>
-                            <td>
-                                <button title="Desativar"
-                                        @onclick="() => DesativarCesta(cesta.Id)">
-                                    🚫
-                                </button>
-                            </td>
-                             <td>
-                                <button title="Editar"
-                                        @onclick="() => EditarCesta(cesta.Id)">
-                                    ✏️
-                                </button>
-                            </td>
+                            @if (cestaEditandoId == cesta.Id)
+                            {
+                                <td>
+                                    <input @bind="cesta.Nome" />
+                                </td>
+
+                                <td>
+                                    <input @bind="cesta.Descricao" />
+                                </td>
+
+                                <td>
+                                    <input type="number" @bind="cesta.QuantidadeDisponivel" />
+                                </td>
+
+                                <td>@cesta.DataCriacao.ToString("dd/MM/yyyy")</td>
+
+                                <td>
+                                    <span class="badge @(cesta.Ativa ? "success" : "danger")">
+                                        @(cesta.Ativa ? "Ativa" : "Desativada")
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <button title="Salvar" @onclick="() => SalvarEdicao(cesta)">
+                                        💾
+                                    </button>
+
+                                    <button title="Cancelar" @onclick="CancelarEdicao">
+                                        ❌
+                                    </button>
+                                </td>
+                            }
+                            else
+                            {
+                                <td><strong>@cesta.Nome</strong></td>
+                                <td>@cesta.Descricao</td>
+                                <td>@cesta.QuantidadeDisponivel</td>
+                                <td>@cesta.DataCriacao.ToString("dd/MM/yyyy")</td>
+
+                                <td>
+                                    <span class="badge @(cesta.Ativa ? "success" : "danger")">
+                                        @(cesta.Ativa ? "Ativa" : "Desativada")
+                                    </span>
+                                </td>
+
+                                <td class="acoes">
+                                    @if (cesta.Ativa)
+                                    {
+                                        <button title="Desativar" @onclick="() => DesativarCesta(cesta.Id)">
+                                            🚫
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button title="Ativar novamente" @onclick="() => AtivarCesta(cesta.Id)">
+                                            🔄
+                                        </button>
+                                    }
+
+                                    <button title="Editar" @onclick="() => EditarCesta(cesta.Id)">
+                                        ✏️
+                                    </button>
+                                </td>
+                            }
                         </tr>
                     }
                 </tbody>

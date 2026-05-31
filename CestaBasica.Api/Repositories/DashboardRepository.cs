@@ -107,18 +107,21 @@ public class DashboardRepository
             })
             .ToListAsync();
         var totalCestasEstoque = await _context.Cestas
+    .Where(c => c.Ativa)
     .Select(c => (int?)c.QuantidadeDisponivel)
     .SumAsync() ?? 0;
 
-        var totalCestasDisponiveis = Math.Max(
-            0,
-            totalCestasEstoque - totalRetiradasPeriodo
-        );
+        var totalCestasDisponiveis = Math.Max(0, totalCestasEstoque);
+
 
         return new DashboardDto
         {
             TotalFuncionarios = totalFuncionarios,
-            TotalCestas = await _context.Cestas.CountAsync(),
+
+            TotalCestas = await _context.Cestas
+        .Where(c => c.Ativa)
+        .CountAsync(),
+
             TotalRetiradas = totalRetiradasPeriodo,
             TotalNotificacoes = await notificacoesQuery.CountAsync(),
 

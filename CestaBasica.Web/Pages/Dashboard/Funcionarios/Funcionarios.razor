@@ -2,6 +2,8 @@
 @using Microsoft.AspNetCore.Components.Routing
 @using Microsoft.AspNetCore.Components.Web
 @using Microsoft.AspNetCore.Components
+@using CestaBasica.Web.Services
+@inject SessaoUsuarioService SessaoUsuario
 
 
 <div class="employees-page">
@@ -186,10 +188,13 @@
                                             🗑️
                                         </button>
 
-                                        <button type="button" title="Visualizar histórico"
-                                                @onclick="() => VisualizarHistorico(funcionario)">
-                                            📄
-                                        </button>
+                                        @if (SessaoUsuario.IsAdmin)
+                                        {
+                                            <button type="button" title="Visualizar histórico"
+                                                    @onclick="() => VisualizarHistorico(funcionario)">
+                                                📄
+                                            </button>
+                                        }
                                     }
                                 </div>
                             </td>

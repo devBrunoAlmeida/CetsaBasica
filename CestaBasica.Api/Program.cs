@@ -35,6 +35,7 @@ builder.Services.AddScoped<NotificacaoRepository>();
 builder.Services.AddScoped<DashboardRepository>();
 builder.Services.AddScoped<UsuarioRepository>();
 builder.Services.AddScoped<HistoricoImportacaoRepository>();
+builder.Services.AddScoped<ConfiguracoesRepository>();
 #endregion
 
 #region Applications
@@ -45,6 +46,7 @@ builder.Services.AddScoped<NotificacaoApplication>();
 builder.Services.AddScoped<DashboardApplication>();
 builder.Services.AddScoped<ImportacaoApplication>();
 builder.Services.AddScoped<UsuarioApplication>();
+builder.Services.AddScoped<ConfiguracoesApplication>();
 #endregion
 
 #region Services
@@ -55,6 +57,7 @@ builder.Services.AddScoped<NotificacaoService>();
 builder.Services.AddScoped<DashboardService>();
 builder.Services.AddScoped<ImportacaoService>();
 builder.Services.AddScoped<UsuarioService>();
+builder.Services.AddScoped<ConfiguracoesService>();
 #endregion
 
 var app = builder.Build();

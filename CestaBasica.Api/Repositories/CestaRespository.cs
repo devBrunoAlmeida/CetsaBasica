@@ -25,12 +25,6 @@ public class CestaRepository
         return await _context.Cestas.FindAsync(id);
     }
 
-    public async Task AdicionarAsync(Cesta cesta)
-    {
-        await _context.Cestas.AddAsync(cesta);
-        await _context.SaveChangesAsync();
-    }
-
     public async Task AtualizarAsync(Cesta cesta)
     {
         _context.Cestas.Update(cesta);
@@ -49,5 +43,10 @@ public class CestaRepository
             .Where(c => c.Ativa && c.QuantidadeDisponivel > 0)
             .OrderByDescending(c => c.Id)
             .FirstOrDefaultAsync();
+    }
+    public async Task AdicionarAsync(Cesta cesta)
+    {
+        await _context.Cestas.AddAsync(cesta);
+        await _context.SaveChangesAsync();
     }
 }

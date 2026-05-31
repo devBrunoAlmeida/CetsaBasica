@@ -13,6 +13,8 @@ public partial class Cesta : ComponentBase
 
     protected CestaDto novaCesta = new();
 
+    protected int? cestaEditandoId;
+
     protected override async Task OnInitializedAsync()
     {
         await CarregarCestas();
@@ -45,13 +47,35 @@ public partial class Cesta : ComponentBase
             await CarregarCestas();
         }
     }
-    private async Task EditarCesta(int id)
+
+    private void EditarCesta(int id)
     {
-        var response = await Http.PutAsync($"api/cestas/{id}/editar", null);
+        cestaEditandoId = id;
+    }
+
+    private void CancelarEdicao()
+    {
+        cestaEditandoId = null;
+    }
+
+    private async Task SalvarEdicao(CestaDto cesta)
+    {
+        var response = await Http.PutAsJsonAsync($"api/cestas/{cesta.Id}", cesta);
 
         if (response.IsSuccessStatusCode)
         {
+            cestaEditandoId = null;
             await CarregarCestas();
         }
     }
+
+    private async Task AtivarCesta(int id)
+{
+    var response = await Http.PutAsync($"api/cestas/{id}/ativar", null);
+
+    if (response.IsSuccessStatusCode)
+    {
+        await CarregarCestas();
+    }
+}
 }

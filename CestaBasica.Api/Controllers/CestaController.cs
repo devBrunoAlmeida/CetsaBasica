@@ -35,4 +35,19 @@ public class CestasController : ControllerBase
         await _app.DesativarAsync(id);
         return Ok();
     }
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Atualizar(int id, [FromBody] CestaDto dto)
+    {
+        dto.Id = id;
+
+        await _app.AtualizarAsync(dto);
+
+        return Ok();
+    }
+    [HttpPut("{id}/ativar")]
+    public async Task<IActionResult> Ativar(int id)
+    {
+        await _app.AtivarAsync(id);
+        return Ok();
+    }
 }
