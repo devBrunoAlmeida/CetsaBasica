@@ -59,14 +59,27 @@
 
                 <div class="form-group">
                     <label for="setor">🏢 Secretaria/Setor</label>
-                    <InputSelect id="setor" class="form-control-custom" @bind-Value="funcionario.Setor">
-                        <option value="">Selecione o setor</option>
-                        <option value="Administração">Administração</option>
-                        <option value="Assistência Social">Assistência Social</option>
-                        <option value="Educação">Educação</option>
-                        <option value="Saúde">Saúde</option>
-                        <option value="Obras e Serviços">Obras e Serviços</option>
+
+                    <InputSelect id="setor" class="form-control-custom" @bind-Value="setorSelecionado"
+                                 @bind-Value:after="AoSelecionarSetor">
+
+                        <option value="">Selecione um setor</option>
+
+                        @foreach (var setor in setores)
+                        {
+                            <option value="@setor">@setor</option>
+                        }
+
+                        <option value="Outro">Outro</option>
+
                     </InputSelect>
+
+                    @if (setorSelecionado == "Outro")
+                    {
+                        <InputText class="form-control-custom setor-outro" @bind-Value="novoSetor"
+                                   @bind-Value:after="AtualizarNovoSetor" placeholder="Digite o novo setor" />
+                    }
+
                     <ValidationMessage For="@(() => funcionario.Setor)" />
                 </div>
             </div>

@@ -18,8 +18,17 @@ public class NotificacaoApplication
         return await _service.EnviarAsync(dto);
     }
 
-    public async Task<List<Notificacao>> ListarAsync()
+    public async Task<List<NotificacaoRequestDto>> ListarAsync()
     {
-        return await _service.ListarAsync();
+        var notificacoes = await _service.ListarAsync();
+
+        return notificacoes.Select(x => new NotificacaoRequestDto
+        {
+            FuncionarioId = x.FuncionarioId,
+            Canal = x.Canal,
+            Titulo = x.Titulo,
+            Mensagem = x.Mensagem,
+            DataEnvio = x.DataEnvio
+        }).ToList();
     }
 }

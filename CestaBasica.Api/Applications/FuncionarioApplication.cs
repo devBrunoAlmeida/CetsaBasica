@@ -53,4 +53,8 @@ public class FuncionarioApplication
     {
         return await _service.ExportarExcelAsync();
     }
+    public async Task<List<string>> ListarSetoresAsync()
+    {
+        return await _service.ListarSetoresAsync();
+    }
 }

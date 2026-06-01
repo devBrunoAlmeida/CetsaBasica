@@ -13,18 +13,53 @@ public partial class CreateFuncionario : ComponentBase
     public NavigationManager Navigation { get; set; } = default!;
 
     protected FuncionarioDto funcionario = new();
+    protected List<string> setores = new();
+    protected string setorSelecionado = string.Empty;
+    protected string novoSetor = string.Empty;
 
-    protected async Task Salvar()
-{
-    var response = await Http.PostAsJsonAsync(
-        "api/funcionarios",
-        funcionario);
-
-    if (response.IsSuccessStatusCode)
+    protected override async Task OnInitializedAsync()
     {
-        Navigation.NavigateTo("/funcionarios");
+        setores = await Http.GetFromJsonAsync<List<string>>("api/funcionarios/setores")
+                  ?? new List<string>();
+
+        funcionario.Setor = string.Empty;
     }
-}
+
+    private void AoSelecionarSetor()
+    {
+        if (string.IsNullOrWhiteSpace(setorSelecionado))
+        {
+            funcionario.Setor = string.Empty;
+            return;
+        }
+
+        if (setorSelecionado == "Outro")
+        {
+            funcionario.Setor = novoSetor;
+            return;
+        }
+
+        funcionario.Setor = setorSelecionado;
+    }
+
+    protected void AtualizarNovoSetor()
+    {
+        funcionario.Setor = novoSetor;
+    }
+    private async Task Salvar()
+    {
+        if (setorSelecionado == "Outro")
+        {
+            funcionario.Setor = novoSetor;
+        }
+
+        if (string.IsNullOrWhiteSpace(funcionario.Setor))
+        {
+            return;
+        }
+
+        await Http.PostAsJsonAsync("api/funcionarios", funcionario);
+    }
 
     protected void Cancelar()
     {
@@ -32,22 +67,22 @@ public partial class CreateFuncionario : ComponentBase
     }
 
     protected void FormatarTelefone(ChangeEventArgs e)
-{
-    var numeros = new string((e.Value?.ToString() ?? "")
-        .Where(char.IsDigit)
-        .ToArray());
+    {
+        var numeros = new string((e.Value?.ToString() ?? "")
+            .Where(char.IsDigit)
+            .ToArray());
 
-    if (numeros.Length > 11)
-        numeros = numeros[..11];
+        if (numeros.Length > 11)
+            numeros = numeros[..11];
 
-    funcionario.Telefone = numeros.Length <= 2
-        ? numeros
-        : numeros.Length <= 6
-            ? $"({numeros[..2]}) {numeros[2..]}"
-            : numeros.Length <= 10
-                ? $"({numeros[..2]}) {numeros[2..6]}-{numeros[6..]}"
-                : $"({numeros[..2]}) {numeros[2..7]}-{numeros[7..]}";
-}
+        funcionario.Telefone = numeros.Length <= 2
+            ? numeros
+            : numeros.Length <= 6
+                ? $"({numeros[..2]}) {numeros[2..]}"
+                : numeros.Length <= 10
+                    ? $"({numeros[..2]}) {numeros[2..6]}-{numeros[6..]}"
+                    : $"({numeros[..2]}) {numeros[2..7]}-{numeros[7..]}";
+    }
 
 
 }

@@ -209,4 +209,8 @@ public class FuncionarioService
 
         return package.GetAsByteArray();
     }
+    public async Task<List<string>> ListarSetoresAsync()
+    {
+        return await _funcionarioRepository.ListarSetoresAsync();
+    }
 }

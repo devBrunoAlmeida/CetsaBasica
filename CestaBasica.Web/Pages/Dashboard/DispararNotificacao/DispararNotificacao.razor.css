@@ -252,3 +252,45 @@ td {
         width: 100%;
     }
 }
+
+.retorno {
+    margin-top: 14px;
+    color: #168a45;
+    font-weight: 800;
+    text-align: center;
+}
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 14px;
+    margin-top: 22px;
+    padding: 12px;
+}
+
+.pagination button {
+    border: none;
+    border-radius: 12px;
+    background: #edf4ff;
+    color: #003b95;
+    padding: 10px 16px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.pagination button:hover {
+    background: #dbeafe;
+    transform: translateY(-1px);
+}
+
+.pagination button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.pagination span {
+    color: #002b6b;
+    font-weight: 800;
+}

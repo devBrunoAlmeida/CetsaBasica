@@ -1,16 +1,26 @@
 namespace CestaBasica.Shared.DTOs;
+using System.ComponentModel.DataAnnotations;
 
 public class FuncionarioDto
 {
     public int Id { get; set; }
+
+    [Required(ErrorMessage = "Nome completo é obrigatório.")]
     public string NomeCompleto { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Matrícula é obrigatória.")]
     public string Matricula { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Código de barras é obrigatório.")]
     public string CodigoBarras { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Telefone é obrigatório.")]
     public string Telefone { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Setor é obrigatório.")]
     public string Setor { get; set; } = string.Empty;
+
     public string Status { get; set; } = string.Empty;
-
-
 }
 public class HistoricoFuncionarioDto
 {

@@ -12,6 +12,5 @@ public class Notificacao
     public string Titulo { get; set; } = "Retirada de Cesta Básica";
     public string? ProtocoloExterno { get; set; }
     public string? Erro { get; set; }
-    public DateTime CriadoEm { get; set; } = DateTime.UtcNow;
     public DateTime? DataEnvio { get; set; }
 }

@@ -1,23 +1,21 @@
 @page "/notificacoes"
-@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Components
 
 <div class="notifications-page">
     <div class="page-header">
         <div>
             <h1>Envio de Notificações</h1>
-            <p>Comunique funcionários de forma individual ou em lote por canais oficiais.</p>
+            <p>Comunique funcionários por WhatsApp.</p>
         </div>
-
-        <button class="btn-secondary">Modelos de mensagem</button>
     </div>
 
     <section class="content-grid">
-
         <div class="panel">
             <div class="panel-header">
                 <h2>Destinatários</h2>
-                <span>Selecione funcionários individualmente ou em lote.</span>
+                <span>Selecione funcionários.</span>
             </div>
 
             <div class="selection-actions">
@@ -26,175 +24,122 @@
             </div>
 
             <div class="employee-list">
-                @foreach (var funcionario in funcionarios)
+                @foreach (var funcionario in FuncionariosPaginados)
                 {
                     <label class="employee-item">
-                        <input type="checkbox"
-                               checked="@funcionario.Selecionado"
-                               @onchange="() => funcionario.Selecionado = !funcionario.Selecionado" />
+                        <input type="checkbox" @bind="funcionario.Selecionado" />
 
                         <div>
-                            <strong>@funcionario.Nome</strong>
-                            <span>@funcionario.Setor • @funcionario.Telefone</span>
+                            <strong> @funcionario.NomeCompleto</strong>
+                            <span> @funcionario.Setor • @funcionario.Telefone</span>
                         </div>
                     </label>
+
                 }
             </div>
+            @if (TotalPaginas > 1)
+            {
+                <div class="pagination">
+                    <button type="button" @onclick="PaginaAnterior" disabled="@(PaginaAtual == 1)">
+                        Anterior
+                    </button>
+
+                    <span>Página @PaginaAtual de @TotalPaginas</span>
+
+                    <button type="button" @onclick="ProximaPagina" disabled="@(PaginaAtual >= TotalPaginas)">
+                        Próxima
+                    </button>
+                </div>
+            }
         </div>
 
         <div class="panel">
             <div class="panel-header">
                 <h2>Mensagem</h2>
-                <span>Personalize o conteúdo antes do envio.</span>
+                <span>Personalize antes do envio.</span>
             </div>
 
             <div class="form-group">
                 <label>Canal de envio</label>
 
                 <div class="channel-options">
-                    <button class="@(canal == "WhatsApp" ? "active" : "")"
-                            @onclick="@(() => canal = "WhatsApp")">
-                        WhatsApp
-                    </button>
-
-                    <button class="@(canal == "SMS" ? "active" : "")"
-                            @onclick="@(() => canal = "SMS")">
-                        SMS
-                    </button>
+                    <button type="button" class="active">WhatsApp</button>
                 </div>
             </div>
 
             <div class="form-group">
                 <label>Mensagem personalizada</label>
 
-                <textarea @bind="mensagem"
-                          maxlength="300"
-                          placeholder="Digite a mensagem que será enviada aos funcionários..."></textarea>
+                <textarea @bind="Mensagem" maxlength="300" placeholder="Digite a mensagem..."></textarea>
 
-                <small>@mensagem.Length/300 caracteres</small>
+                <small>@Mensagem.Length/300 caracteres</small>
             </div>
 
             <div class="preview-box">
                 <span>Pré-visualização</span>
-                <p>@mensagem</p>
-                <strong>Canal: @canal</strong>
+                <p>@Mensagem</p>
+                <strong>Canal: WhatsApp</strong>
             </div>
 
             <button class="btn-primary" @onclick="EnviarNotificacao">
                 Enviar notificação
             </button>
-        </div>
 
+            @if (!string.IsNullOrWhiteSpace(MensagemRetorno))
+            {
+                <p class="retorno">@MensagemRetorno</p>
+            }
+        </div>
     </section>
 
     <section class="history-panel">
         <div class="panel-header">
             <h2>Histórico de notificações enviadas</h2>
-            <span>Registro das últimas comunicações realizadas.</span>
+            <span>Últimas comunicações realizadas.</span>
         </div>
 
         <div class="table-responsive">
             <table>
                 <thead>
                     <tr>
-                        <th>Destinatário</th>
+                        <th>Funcionário</th>
                         <th>Canal</th>
                         <th>Mensagem</th>
                         <th>Data</th>
-                        <th>Status</th>
                     </tr>
                 </thead>
 
                 <tbody>
-                    @foreach (var item in historico)
+                    @foreach (var item in HistoricoPaginado)
                     {
                         <tr>
-                            <td>@item.Destinatario</td>
+                            <td>@item.FuncionarioId</td>
                             <td>@item.Canal</td>
                             <td>@item.Mensagem</td>
-                            <td>@item.Data</td>
                             <td>
-                                <span class="badge @item.Status.ToLower()">
-                                    @item.Status
-                                </span>
+                                @(item.DataEnvio?.ToString("dd/MM/yyyy HH:mm") ?? "-")
                             </td>
                         </tr>
                     }
                 </tbody>
+                @if (TotalPaginasHistorico > 1)
+                {
+                    <div class="pagination">
+                        <button type="button" @onclick="PaginaAnteriorHistorico" disabled="@(PaginaAtualHistorico == 1)">
+                            Anterior
+                        </button>
+
+                        <span>Página @PaginaAtualHistorico de @TotalPaginasHistorico</span>
+
+                        <button type="button" @onclick="ProximaPaginaHistorico"
+                                disabled="@(PaginaAtualHistorico >= TotalPaginasHistorico)">
+                            Próxima
+                        </button>
+                    </div>
+                }
             </table>
+
         </div>
     </section>
-
 </div>
 
-@code {
-    private string canal = "WhatsApp";
-
-    private string mensagem =
-        "Prezado(a), informamos que sua cesta básica está disponível para retirada no setor responsável.";
-
-    private List<FuncionarioNotificacao> funcionarios = new()
-    {
-        new("Maria Oliveira", "Educação", "(15) 99999-1001", true),
-        new("João Santos", "Saúde", "(15) 99999-1002", false),
-        new("Ana Lima", "Assistência Social", "(15) 99999-1003", true),
-        new("Carlos Pereira", "Administração", "(15) 99999-1004", false)
-    };
-
-    private List<HistoricoNotificacao> historico = new()
-    {
-        new("Maria Oliveira", "WhatsApp", "Convocação para retirada enviada.", "16/05/2026 09:20", "Entregue"),
-        new("João Santos", "SMS", "Pendência de retirada informada.", "16/05/2026 08:45", "Enviado"),
-        new("Ana Lima", "WhatsApp", "Notificação automática processada.", "15/05/2026 15:10", "Falhou")
-    };
-
-    private void SelecionarTodos()
-    {
-        foreach (var funcionario in funcionarios)
-            funcionario.Selecionado = true;
-    }
-
-    private void LimparSelecao()
-    {
-        foreach (var funcionario in funcionarios)
-            funcionario.Selecionado = false;
-    }
-
-    private void EnviarNotificacao()
-    {
-        foreach (var funcionario in funcionarios.Where(x => x.Selecionado))
-        {
-            historico.Insert(0, new HistoricoNotificacao(
-                funcionario.Nome,
-                canal,
-                mensagem,
-                DateTime.UtcNow.ToString("dd/MM/yyyy HH:mm"),
-                "Enviado"
-            ));
-        }
-    }
-
-    public class FuncionarioNotificacao
-    {
-        public FuncionarioNotificacao(string nome, string setor, string telefone, bool selecionado)
-        {
-            Nome = nome;
-            Setor = setor;
-            Telefone = telefone;
-            Selecionado = selecionado;
-        }
-
-        public string Nome { get; set; }
-        public string Setor { get; set; }
-        public string Telefone { get; set; }
-        public bool Selecionado { get; set; }
-    }
-
-    public record HistoricoNotificacao(
-        string Destinatario,
-        string Canal,
-        string Mensagem,
-        string Data,
-        string Status
-    );
-}

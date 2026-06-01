@@ -14,12 +14,12 @@ public class FuncionarioRepository
     }
 
     public async Task<Funcionario> CriarAsync(Funcionario funcionario)
-{
-    _context.Funcionarios.Add(funcionario);
-    await _context.SaveChangesAsync();
+    {
+        _context.Funcionarios.Add(funcionario);
+        await _context.SaveChangesAsync();
 
-    return funcionario;
-}
+        return funcionario;
+    }
 
     public async Task<List<Funcionario>> ListarAsync()
     {
@@ -44,26 +44,35 @@ public class FuncionarioRepository
     }
 
     public async Task ExcluirAsync(int id)
-{
-    var funcionario = await _context.Funcionarios
-        .FirstOrDefaultAsync(x => x.Id == id);
+    {
+        var funcionario = await _context.Funcionarios
+            .FirstOrDefaultAsync(x => x.Id == id);
 
-    if (funcionario is null)
-        throw new Exception("Funcionário não encontrado.");
+        if (funcionario is null)
+            throw new Exception("Funcionário não encontrado.");
 
-    _context.Funcionarios.Remove(funcionario);
+        _context.Funcionarios.Remove(funcionario);
 
-    await _context.SaveChangesAsync();
-}
+        await _context.SaveChangesAsync();
+    }
 
-public async Task<List<Funcionario>> BuscaManualAsync(string termo)
-{
-    return await _context.Funcionarios
-        .Where(f =>
-            f.NomeCompleto.ToLower().Contains(termo.ToLower()) ||
-            f.Matricula.ToLower().Contains(termo.ToLower()))
-        .Take(10)
-        .ToListAsync();
-}
+    public async Task<List<Funcionario>> BuscaManualAsync(string termo)
+    {
+        return await _context.Funcionarios
+            .Where(f =>
+                f.NomeCompleto.ToLower().Contains(termo.ToLower()) ||
+                f.Matricula.ToLower().Contains(termo.ToLower()))
+            .Take(10)
+            .ToListAsync();
+    }
+    public async Task<List<string>> ListarSetoresAsync()
+    {
+        return await _context.Funcionarios
+            .Where(x => !string.IsNullOrWhiteSpace(x.Setor))
+            .Select(x => x.Setor)
+            .Distinct()
+            .OrderBy(x => x)
+            .ToListAsync();
+    }
 
 }

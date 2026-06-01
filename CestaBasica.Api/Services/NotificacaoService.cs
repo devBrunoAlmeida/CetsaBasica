@@ -8,13 +8,16 @@ public class NotificacaoService
 {
     private readonly FuncionarioRepository _funcionarioRepository;
     private readonly NotificacaoRepository _notificacaoRepository;
+    private readonly EvolutionApiService _evolutionApiService;
 
     public NotificacaoService(
         FuncionarioRepository funcionarioRepository,
-        NotificacaoRepository notificacaoRepository)
+        NotificacaoRepository notificacaoRepository,
+        EvolutionApiService evolutionApiService)
     {
         _funcionarioRepository = funcionarioRepository;
         _notificacaoRepository = notificacaoRepository;
+        _evolutionApiService = evolutionApiService;
     }
 
     public async Task<Notificacao> EnviarAsync(NotificacaoRequestDto dto)
@@ -37,10 +40,26 @@ public class NotificacaoService
             Telefone = funcionario.Telefone,
             Titulo = dto.Titulo,
             Mensagem = dto.Mensagem,
-            Status = "Enviado",
-            ProtocoloExterno = Guid.NewGuid().ToString(),
+            Status = "Pendente",
             DataEnvio = DateTime.UtcNow
         };
+
+        try
+        {
+            var resultado = await _evolutionApiService.EnviarTextoAsync(
+                funcionario.Telefone,
+                dto.Mensagem
+            );
+
+            notificacao.Status = "Enviado";
+            notificacao.ProtocoloExterno = resultado;
+            notificacao.DataEnvio = DateTime.UtcNow;
+        }
+        catch (Exception ex)
+        {
+            notificacao.Status = "Falhou";
+            notificacao.Erro = ex.Message;
+        }
 
         return await _notificacaoRepository.CriarAsync(notificacao);
     }

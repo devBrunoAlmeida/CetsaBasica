@@ -90,4 +90,11 @@ public class FuncionariosController : ControllerBase
             "funcionarios.xlsx"
         );
     }
+
+    [HttpGet("setores")]
+public async Task<IActionResult> ListarSetores()
+{
+    var setores = await _app.ListarSetoresAsync();
+    return Ok(setores);
+}
 }

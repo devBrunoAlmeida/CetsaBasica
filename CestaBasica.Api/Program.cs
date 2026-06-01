@@ -58,6 +58,7 @@ builder.Services.AddScoped<DashboardService>();
 builder.Services.AddScoped<ImportacaoService>();
 builder.Services.AddScoped<UsuarioService>();
 builder.Services.AddScoped<ConfiguracoesService>();
+builder.Services.AddHttpClient<EvolutionApiService>();
 #endregion
 
 var app = builder.Build();
