@@ -19,6 +19,11 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 
 Console.WriteLine("CONNECTION STRING:");
 Console.WriteLine(connectionString);
+Console.WriteLine("EVOLUTION CONFIG:");
+Console.WriteLine(builder.Configuration["EvolutionApi:BaseUrl"]);
+Console.WriteLine(builder.Configuration["EvolutionApi:ApiKey"]);
+Console.WriteLine(builder.Configuration["EvolutionApi:Instance"]);
+
 
 if (string.IsNullOrWhiteSpace(connectionString))
     throw new Exception("ConnectionString DefaultConnection não configurada.");
@@ -75,5 +80,12 @@ if (app.Environment.IsDevelopment())
 
 // Mapear controllers
 app.MapControllers();
+// Rodar migrations automaticamente
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.Migrate();
+}
+
 
 app.Run();

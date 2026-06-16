@@ -20,6 +20,15 @@ public class EvolutionApiService
         var apiKey = _configuration["EvolutionApi:ApiKey"];
         var instance = _configuration["EvolutionApi:Instance"];
 
+        if (string.IsNullOrWhiteSpace(baseUrl))
+            throw new Exception("EvolutionApi:BaseUrl não foi lido do appsettings.");
+
+        if (string.IsNullOrWhiteSpace(apiKey))
+            throw new Exception("EvolutionApi:ApiKey não foi lido do appsettings.");
+
+        if (string.IsNullOrWhiteSpace(instance))
+            throw new Exception("EvolutionApi:Instance não foi lido do appsettings.");
+
         var numero = new string(telefone.Where(char.IsDigit).ToArray());
 
         if (!numero.StartsWith("55"))
@@ -31,11 +40,9 @@ public class EvolutionApiService
             text = mensagem
         };
 
-        var request = new HttpRequestMessage(
-            HttpMethod.Post,
-            $"{baseUrl}/message/sendText/{instance}"
-        );
+        var url = $"{baseUrl}/message/sendText/{instance}";
 
+        var request = new HttpRequestMessage(HttpMethod.Post, url);
         request.Headers.Add("apikey", apiKey);
         request.Content = JsonContent.Create(body);
 

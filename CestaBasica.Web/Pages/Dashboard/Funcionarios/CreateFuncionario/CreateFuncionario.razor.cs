@@ -58,7 +58,20 @@ public partial class CreateFuncionario : ComponentBase
             return;
         }
 
-        await Http.PostAsJsonAsync("api/funcionarios", funcionario);
+        var response = await Http.PostAsJsonAsync("api/funcionarios", funcionario);
+
+        if (response.IsSuccessStatusCode)
+        {
+            funcionario = new FuncionarioDto
+            {
+                Setor = string.Empty
+            };
+
+            setorSelecionado = string.Empty;
+            novoSetor = string.Empty;
+
+            StateHasChanged();
+        }
     }
 
     protected void Cancelar()
@@ -66,9 +79,9 @@ public partial class CreateFuncionario : ComponentBase
         Navigation.NavigateTo("/funcionarios");
     }
 
-    protected void FormatarTelefone(ChangeEventArgs e)
+    protected void FormatarTelefone(string? valor)
     {
-        var numeros = new string((e.Value?.ToString() ?? "")
+        var numeros = new string((valor ?? "")
             .Where(char.IsDigit)
             .ToArray());
 
@@ -83,6 +96,4 @@ public partial class CreateFuncionario : ComponentBase
                     ? $"({numeros[..2]}) {numeros[2..6]}-{numeros[6..]}"
                     : $"({numeros[..2]}) {numeros[2..7]}-{numeros[7..]}";
     }
-
-
 }
