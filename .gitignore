@@ -7,3 +7,5 @@ appsettings.Development.json
 *.suo
 *.dll
 *.pdb
+start.sh
+config_local.txt
