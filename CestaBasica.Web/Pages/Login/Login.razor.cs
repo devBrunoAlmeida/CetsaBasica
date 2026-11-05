@@ -21,16 +21,23 @@ public partial class Login
     {
         mensagem = "";
 
-        var response = await UsuarioService.LoginAsync(login);
-
-        if (response is null)
+        try
         {
-            mensagem = "Usuário ou senha inválidos.";
-            return;
+            var (response, erro) = await UsuarioService.LoginComDetalheAsync(login);
+
+            if (response is null)
+            {
+                mensagem = erro ?? "Usuário ou senha inválidos.";
+                return;
+            }
+
+            Sessao.Login(response);
+
+            Navigation.NavigateTo("/dashboard");
         }
-
-        Sessao.Login(response);
-
-        Navigation.NavigateTo("/dashboard");
+        catch
+        {
+            mensagem = "Não foi possível conectar à API. Verifique se o backend está em execução.";
+        }
     }
 }

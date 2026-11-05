@@ -59,12 +59,12 @@
 
             <div>
                 <label>Data inicial</label>
-                <input type="date" value="@dataInicial" @onchange="FiltrarDataInicial" />
+                <input type="date" value="@(dataInicial?.ToString("yyyy-MM-dd"))" @onchange="FiltrarDataInicial" />
             </div>
 
             <div>
                 <label>Data final</label>
-                <input type="date" value="@dataFinal" @onchange="FiltrarDataFinal" />
+                <input type="date" value="@(dataFinal?.ToString("yyyy-MM-dd"))" @onchange="FiltrarDataFinal" />
             </div>
         </div>
     </section>
@@ -215,13 +215,23 @@
                     Anterior
                 </button>
 
-                @for (var i = 1; i <= TotalPaginas; i++)
+                @if (PaginaAtual > 4)
                 {
-                    var pagina = i;
+                    <button @onclick="() => IrParaPagina(1)">1</button>
+                    <span>...</span>
+                }
 
+                @foreach (var pagina in PaginasVisiveis)
+                {
                     <button class="@(PaginaAtual == pagina ? "active" : "")" @onclick="() => IrParaPagina(pagina)">
                         @pagina
                     </button>
+                }
+
+                @if (PaginaAtual < TotalPaginas - 3)
+                {
+                    <span>...</span>
+                    <button @onclick="() => IrParaPagina(TotalPaginas)">@TotalPaginas</button>
                 }
 
                 <button disabled="@(PaginaAtual == TotalPaginas)" @onclick="ProximaPagina">

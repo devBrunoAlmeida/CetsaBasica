@@ -24,6 +24,15 @@ public class NotificacaoRepository
     {
         return await _context.Notificacoes
             .Include(n => n.Funcionario)
+            .OrderByDescending(n => n.DataEnvio)
+            .ToListAsync();
+    }
+
+    public async Task<List<Notificacao>> ListarPorFuncionarioAsync(int funcionarioId)
+    {
+        return await _context.Notificacoes
+            .Where(n => n.FuncionarioId == funcionarioId)
+            .OrderByDescending(n => n.DataEnvio)
             .ToListAsync();
     }
 }

@@ -7,20 +7,250 @@
     <div class="page-header">
         <div>
             <h1>Envio de Notificações</h1>
-            <p>Comunique funcionários por WhatsApp.</p>
+            <p>Conecte seu WhatsApp via Evolution API e comunique os funcionários sobre a retirada das cestas.</p>
         </div>
     </div>
+
+    <!-- CARD DE CONEXÃO DO TELEFONE (EVOLUTION API) -->
+    <section class="whatsapp-connection-card">
+        <div class="whatsapp-header">
+            <div class="whatsapp-status-info">
+                <div class="whatsapp-icon @(StatusWhatsapp.Conectado ? "connected" : StatusWhatsapp.Configurado ? "disconnected" : "unconfigured")">
+                    📱
+                </div>
+                <div>
+                    <div class="status-title-row">
+                        <h2>Telefone Remetente (WhatsApp)</h2>
+                        @if (StatusWhatsapp.Conectado)
+                        {
+                            <span class="conn-pill connected">● Conectado</span>
+                        }
+                        else if (StatusWhatsapp.Configurado)
+                        {
+                            <span class="conn-pill disconnected">● Desconectado</span>
+                        }
+                        else
+                        {
+                            <span class="conn-pill unconfigured">⚙️ Não configurado</span>
+                        }
+                    </div>
+
+                    @if (StatusWhatsapp.Conectado)
+                    {
+                        <p class="conn-details">
+                            Instância: <strong>@StatusWhatsapp.InstanceName</strong>
+                            @if (!string.IsNullOrWhiteSpace(StatusWhatsapp.PerfilNome))
+                            {
+                                <span> • Perfil: <strong>@StatusWhatsapp.PerfilNome</strong></span>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(StatusWhatsapp.NumeroConectado))
+                            {
+                                <span> • Número: <strong>@StatusWhatsapp.NumeroConectado</strong></span>
+                            }
+                        </p>
+                    }
+                    else
+                    {
+                        <p class="conn-details">@StatusWhatsapp.Mensagem</p>
+                    }
+                </div>
+            </div>
+
+            <div class="whatsapp-actions">
+                @if (StatusWhatsapp.Conectado)
+                {
+                    <button type="button" class="btn-secondary" @onclick="AlternarPainelTeste" disabled="@CarregandoWhatsapp">
+                        📨 Testar envio
+                    </button>
+                    <button type="button" class="btn-secondary" @onclick="AlternarPainelConfig" disabled="@CarregandoWhatsapp">
+                        ⚙️ Servidor
+                    </button>
+                    <button type="button" class="btn-danger-outline" @onclick="DesconectarTelefoneAsync" disabled="@CarregandoWhatsapp">
+                        🔌 Desconectar telefone
+                    </button>
+                }
+                else
+                {
+                    <button type="button" class="btn-connect" @onclick="AbrirEConectarTelefoneAsync" disabled="@CarregandoWhatsapp">
+                        📱 Conectar meu WhatsApp
+                    </button>
+                    <button type="button" class="btn-secondary" @onclick="AlternarPainelConfig" disabled="@CarregandoWhatsapp">
+                        ⚙️ Configurar Evolution API
+                    </button>
+                    <button type="button" class="btn-icon" title="Atualizar status" @onclick="CarregarStatusWhatsappAsync" disabled="@CarregandoWhatsapp">
+                        🔄
+                    </button>
+                }
+            </div>
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(FeedbackWhatsapp))
+        {
+            <div class="whatsapp-feedback @(FeedbackWhatsappErro ? "error" : "ok")">
+                @FeedbackWhatsapp
+            </div>
+        }
+
+        @if (ExibirPainelConfig)
+        {
+            <div class="whatsapp-subpanel">
+                <div class="subpanel-header">
+                    <h3>⚙️ Configuração do Servidor Evolution API</h3>
+                    <span>Informe os dados da sua instância Evolution API. Eles ficam salvos no banco de dados.</span>
+                </div>
+
+                <div class="config-grid">
+                    <div class="form-group">
+                        <label>URL da Evolution API</label>
+                        <input class="input-clean" @bind="FormConfig.BaseUrl" placeholder="Ex: http://localhost:8080" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            API Key (Global ou da Instância)
+                            @if (!string.IsNullOrWhiteSpace(StatusWhatsapp.ApiKeyMascarada))
+                            {
+                                <small class="saved-key-hint">Atual: @StatusWhatsapp.ApiKeyMascarada</small>
+                            }
+                        </label>
+                        <input type="password" class="input-clean" @bind="FormConfig.ApiKey"
+                               placeholder="@(string.IsNullOrWhiteSpace(StatusWhatsapp.ApiKeyMascarada) ? "Cole sua API Key da Evolution" : "Deixe em branco para manter a chave atual")" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Nome da Instância</label>
+                        <input class="input-clean" @bind="FormConfig.InstanceName" placeholder="Ex: cesta-basica" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Seu Telefone WhatsApp (Opcional)</label>
+                        <input class="input-clean" @bind="FormConfig.Telefone" placeholder="(15) 99999-9999" />
+                    </div>
+                </div>
+
+                <div class="subpanel-actions">
+                    <button type="button" class="btn-secondary" @onclick="() => ExibirPainelConfig = false">
+                        Cancelar
+                    </button>
+                    <button type="button" class="btn-secondary" @onclick="() => SalvarConfiguracaoWhatsappAsync(false)" disabled="@CarregandoWhatsapp">
+                        💾 Salvar
+                    </button>
+                    <button type="button" class="btn-connect" @onclick="() => SalvarConfiguracaoWhatsappAsync(true)" disabled="@CarregandoWhatsapp">
+                        💾 Salvar e Conectar Telefone
+                    </button>
+                </div>
+            </div>
+        }
+
+        @if (ExibirPainelTeste && StatusWhatsapp.Conectado)
+        {
+            <div class="whatsapp-subpanel">
+                <div class="subpanel-header">
+                    <h3>📨 Enviar Mensagem de Teste</h3>
+                    <span>Valide o envio no seu próprio número antes de disparar para os funcionários.</span>
+                </div>
+
+                <div class="test-row">
+                    <input class="input-clean" @bind="TelefoneTeste" placeholder="Digite o telefone com DDD: (15) 99999-9999" />
+                    <button type="button" class="btn-connect" @onclick="EnviarMensagemTesteAsync" disabled="@CarregandoWhatsapp">
+                        @(CarregandoWhatsapp ? "Enviando..." : "Enviar agora")
+                    </button>
+                    <button type="button" class="btn-secondary" @onclick="() => ExibirPainelTeste = false">
+                        Fechar
+                    </button>
+                </div>
+            </div>
+        }
+
+        @if (ExibirPainelPareamento && !StatusWhatsapp.Conectado)
+        {
+            <div class="whatsapp-subpanel pairing-grid">
+                <div class="pairing-steps">
+                    <h3>Como conectar seu celular</h3>
+                    <ol>
+                        <li>Abra o <strong>WhatsApp</strong> no telefone que deseja usar para os disparos.</li>
+                        <li>Toque em <strong>Mais opções (⋮)</strong> ou <strong>Configurações</strong> e escolha <strong>Aparelhos conectados</strong>.</li>
+                        <li>Toque em <strong>Conectar um aparelho</strong> e aponte a câmera para o QR Code ao lado.</li>
+                    </ol>
+
+                    <div class="pairing-mode-toggle">
+                        <label class="checkbox-inline">
+                            <input type="checkbox" @bind="UsarCodigoPareamento" />
+                            Prefiro conectar digitando o número do telefone (Código de Pareamento)
+                        </label>
+
+                        @if (UsarCodigoPareamento)
+                        {
+                            <div class="pairing-phone-box">
+                                <input class="input-clean" @bind="TelefonePareamento" placeholder="Ex: (15) 99999-9999" />
+                                <button type="button" class="btn-connect" @onclick="GerarConexaoTelefoneAsync" disabled="@CarregandoWhatsapp">
+                                    Gerar código
+                                </button>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="subpanel-actions left">
+                        <button type="button" class="btn-secondary" @onclick="GerarConexaoTelefoneAsync" disabled="@CarregandoWhatsapp">
+                            🔄 Atualizar QR Code
+                        </button>
+                        <button type="button" class="btn-secondary" @onclick="FecharPainelPareamento">
+                            Fechar
+                        </button>
+                    </div>
+                </div>
+
+                <div class="qr-box">
+                    @if (CarregandoWhatsapp)
+                    {
+                        <div class="qr-placeholder">
+                            <span>⏳ Gerando conexão com a Evolution API...</span>
+                        </div>
+                    }
+                    else if (!string.IsNullOrWhiteSpace(PairingCode))
+                    {
+                        <div class="pairing-code-display">
+                            <span>Código de Pareamento</span>
+                            <strong>@PairingCode</strong>
+                            <small>Digite este código no aviso exibido em seu WhatsApp</small>
+                        </div>
+                    }
+                    else if (!string.IsNullOrWhiteSpace(QrCodeBase64))
+                    {
+                        <img src="@QrCodeBase64" alt="QR Code WhatsApp" class="qr-image" />
+                        <small class="qr-waiting">Aguardando leitura no celular... A tela atualizará sozinha.</small>
+                    }
+                    else
+                    {
+                        <div class="qr-placeholder">
+                            <span>Clique em "Atualizar QR Code" para gerar um novo código.</span>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </section>
 
     <section class="content-grid">
         <div class="panel">
             <div class="panel-header">
-                <h2>Destinatários</h2>
-                <span>Selecione funcionários.</span>
+                <div>
+                    <h2>Destinatários</h2>
+                    <span>Selecionados: <strong>@QuantidadeSelecionados</strong> funcionário(s)</span>
+                </div>
+            </div>
+
+            <div class="search-recipient-box">
+                <input class="input-clean"
+                       placeholder="🔎 Pesquisar por nome, setor ou telefone..."
+                       @bind="TermoBuscaFuncionario"
+                       @bind:event="oninput"
+                       @bind:after="AoBuscarFuncionario" />
             </div>
 
             <div class="selection-actions">
-                <button @onclick="SelecionarTodos">Selecionar todos</button>
-                <button @onclick="LimparSelecao">Limpar seleção</button>
+                <button type="button" @onclick="SelecionarTodosFiltrados">Selecionar listados (@FuncionariosFiltrados.Count())</button>
+                <button type="button" @onclick="LimparSelecao">Limpar seleção</button>
             </div>
 
             <div class="employee-list">
@@ -30,13 +260,13 @@
                         <input type="checkbox" @bind="funcionario.Selecionado" />
 
                         <div>
-                            <strong> @funcionario.NomeCompleto</strong>
-                            <span> @funcionario.Setor • @funcionario.Telefone</span>
+                            <strong>@funcionario.NomeCompleto</strong>
+                            <span>@funcionario.Setor • @funcionario.Telefone</span>
                         </div>
                     </label>
-
                 }
             </div>
+
             @if (TotalPaginas > 1)
             {
                 <div class="pagination">
@@ -55,22 +285,24 @@
 
         <div class="panel">
             <div class="panel-header">
-                <h2>Mensagem</h2>
-                <span>Personalize antes do envio.</span>
+                <div>
+                    <h2>Mensagem</h2>
+                    <span>Personalize antes do envio.</span>
+                </div>
             </div>
 
             <div class="form-group">
                 <label>Canal de envio</label>
 
                 <div class="channel-options">
-                    <button type="button" class="active">WhatsApp</button>
+                    <button type="button" class="active">WhatsApp (Evolution API)</button>
                 </div>
             </div>
 
             <div class="form-group">
                 <label>Mensagem personalizada</label>
 
-                <textarea @bind="Mensagem" maxlength="300" placeholder="Digite a mensagem..."></textarea>
+                <textarea @bind="Mensagem" @bind:event="oninput" maxlength="300" placeholder="Digite a mensagem..."></textarea>
 
                 <small>@Mensagem.Length/300 caracteres</small>
             </div>
@@ -78,24 +310,31 @@
             <div class="preview-box">
                 <span>Pré-visualização</span>
                 <p>@Mensagem</p>
-                <strong>Canal: WhatsApp</strong>
+                <strong>
+                    Status do telefone:
+                    @(StatusWhatsapp.Conectado
+                        ? $"Conectado ({StatusWhatsapp.NumeroConectado ?? StatusWhatsapp.InstanceName})"
+                        : "Desconectado — conecte seu WhatsApp acima")
+                </strong>
             </div>
 
-            <button class="btn-primary" @onclick="EnviarNotificacao">
-                Enviar notificação
+            <button class="btn-primary" @onclick="EnviarNotificacao" disabled="@EnviandoNotificacoes">
+                @(EnviandoNotificacoes ? "Enviando notificações..." : $"Enviar notificação ({QuantidadeSelecionados})")
             </button>
 
             @if (!string.IsNullOrWhiteSpace(MensagemRetorno))
             {
-                <p class="retorno">@MensagemRetorno</p>
+                <p class="retorno @(RetornoErro ? "erro" : "")">@MensagemRetorno</p>
             }
         </div>
     </section>
 
     <section class="history-panel">
         <div class="panel-header">
-            <h2>Histórico de notificações enviadas</h2>
-            <span>Últimas comunicações realizadas.</span>
+            <div>
+                <h2>Histórico de notificações enviadas</h2>
+                <span>Últimas comunicações realizadas nos últimos 30 dias.</span>
+            </div>
         </div>
 
         <div class="table-responsive">
@@ -104,6 +343,7 @@
                     <tr>
                         <th>Funcionário</th>
                         <th>Canal</th>
+                        <th>Status</th>
                         <th>Mensagem</th>
                         <th>Data</th>
                     </tr>
@@ -113,8 +353,13 @@
                     @foreach (var item in HistoricoPaginado)
                     {
                         <tr>
-                            <td>@item.FuncionarioId</td>
+                            <td>@(string.IsNullOrWhiteSpace(item.FuncionarioNome) ? $"ID #{item.FuncionarioId}" : item.FuncionarioNome)</td>
                             <td>@item.Canal</td>
+                            <td>
+                                <span class="badge @(item.Status == "Enviado" ? "entregue" : "falhou")">
+                                    @(string.IsNullOrWhiteSpace(item.Status) ? "Enviado" : item.Status)
+                                </span>
+                            </td>
                             <td>@item.Mensagem</td>
                             <td>
                                 @(item.DataEnvio?.ToString("dd/MM/yyyy HH:mm") ?? "-")
@@ -122,24 +367,23 @@
                         </tr>
                     }
                 </tbody>
-                @if (TotalPaginasHistorico > 1)
-                {
-                    <div class="pagination">
-                        <button type="button" @onclick="PaginaAnteriorHistorico" disabled="@(PaginaAtualHistorico == 1)">
-                            Anterior
-                        </button>
-
-                        <span>Página @PaginaAtualHistorico de @TotalPaginasHistorico</span>
-
-                        <button type="button" @onclick="ProximaPaginaHistorico"
-                                disabled="@(PaginaAtualHistorico >= TotalPaginasHistorico)">
-                            Próxima
-                        </button>
-                    </div>
-                }
             </table>
 
+            @if (TotalPaginasHistorico > 1)
+            {
+                <div class="pagination">
+                    <button type="button" @onclick="PaginaAnteriorHistorico" disabled="@(PaginaAtualHistorico == 1)">
+                        Anterior
+                    </button>
+
+                    <span>Página @PaginaAtualHistorico de @TotalPaginasHistorico</span>
+
+                    <button type="button" @onclick="ProximaPaginaHistorico"
+                            disabled="@(PaginaAtualHistorico >= TotalPaginasHistorico)">
+                        Próxima
+                    </button>
+                </div>
+            }
         </div>
     </section>
 </div>
-

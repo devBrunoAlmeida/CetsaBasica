@@ -1,3 +1,4 @@
+using System.Net.Http.Json;
 using CestaBasica.Shared.DTOs;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
@@ -12,6 +13,7 @@ public partial class RetiradaCesta
     private string codigoBarras = "";
     private string buscaManual = "";
     private bool retiradaConfirmada = false;
+    private string? erroRetirada;
     private string ultimoFuncionario = "";
 
     private FuncionarioDto? funcionarioSelecionado;
@@ -54,10 +56,11 @@ public partial class RetiradaCesta
         }
     }
 
-
     private async Task BuscarPorCodigo(ChangeEventArgs e)
     {
-        codigoBarras = e.Value?.ToString() ?? "";
+        codigoBarras = e.Value?.ToString()?.Trim() ?? "";
+        erroRetirada = null;
+        retiradaConfirmada = false;
 
         if (string.IsNullOrWhiteSpace(codigoBarras))
         {
@@ -65,15 +68,28 @@ public partial class RetiradaCesta
             return;
         }
 
-        funcionarioSelecionado =
-            await Http.GetFromJsonAsync<FuncionarioDto>($"api/funcionarios/codigo/{codigoBarras}");
-
-        retiradaConfirmada = false;
+        try
+        {
+            var response = await Http.GetAsync($"api/funcionarios/codigo/{Uri.EscapeDataString(codigoBarras)}");
+            if (response.IsSuccessStatusCode)
+            {
+                funcionarioSelecionado = await response.Content.ReadFromJsonAsync<FuncionarioDto>();
+            }
+            else
+            {
+                funcionarioSelecionado = null;
+            }
+        }
+        catch
+        {
+            funcionarioSelecionado = null;
+        }
     }
 
     private async Task BuscarManual(ChangeEventArgs e)
     {
         buscaManual = e.Value?.ToString() ?? "";
+        erroRetirada = null;
 
         if (buscaManual.Length < 2)
         {
@@ -81,9 +97,16 @@ public partial class RetiradaCesta
             return;
         }
 
-        resultadosBusca =
-            await Http.GetFromJsonAsync<List<FuncionarioDto>>($"api/funcionarios/buscar?termo={buscaManual}")
-            ?? new();
+        try
+        {
+            resultadosBusca =
+                await Http.GetFromJsonAsync<List<FuncionarioDto>>($"api/funcionarios/buscar?termo={Uri.EscapeDataString(buscaManual)}")
+                ?? new();
+        }
+        catch
+        {
+            resultadosBusca.Clear();
+        }
     }
 
     private void SelecionarFuncionario(FuncionarioDto funcionario)
@@ -92,6 +115,7 @@ public partial class RetiradaCesta
         resultadosBusca.Clear();
         buscaManual = funcionario.NomeCompleto;
         retiradaConfirmada = false;
+        erroRetirada = null;
     }
 
     private async Task ConfirmarRetirada()
@@ -99,19 +123,33 @@ public partial class RetiradaCesta
         if (funcionarioSelecionado is null)
             return;
 
+        erroRetirada = null;
+        retiradaConfirmada = false;
+
         var response = await Http.PostAsync(
             $"api/retiradas/confirmar/{funcionarioSelecionado.Id}",
             null
         );
 
         if (!response.IsSuccessStatusCode)
+        {
+            try
+            {
+                var erro = await response.Content.ReadFromJsonAsync<ErroApiDto>();
+                erroRetirada = erro?.Mensagem ?? "Não foi possível registrar a retirada.";
+            }
+            catch
+            {
+                erroRetirada = "Não foi possível registrar a retirada.";
+            }
             return;
+        }
 
         ultimoFuncionario = funcionarioSelecionado.NomeCompleto;
         funcionarioSelecionado.Status = "Retirado";
 
-        historico = await Http.GetFromJsonAsync<List<FuncionarioDto>>("api/retiradas/recentes")
-                   ?? new();
+        await CarregarHistoricoFuncionarios();
+        await CarregarHistoricoRetiradas();
 
         retiradaConfirmada = true;
     }

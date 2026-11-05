@@ -37,10 +37,36 @@ public class UsuarioService
             Email = dto.Email,
             SenhaHash = BCrypt.Net.BCrypt.HashPassword(dto.Senha),
             Perfil = dto.Perfil,
-            Ativo = true
+            Ativo = dto.Ativo
         };
 
         return await _repo.CriarAsync(usuario);
+    }
+
+    public async Task<Usuario> AtualizarAsync(int id, UsuarioUpdateDto dto)
+    {
+        var usuario = await _repo.BuscarPorIdAsync(id);
+        if (usuario == null)
+            throw new Exception("Usuário não encontrado.");
+
+        if (!string.IsNullOrWhiteSpace(dto.Nome))
+            usuario.Nome = dto.Nome;
+
+        if (!string.IsNullOrWhiteSpace(dto.Email))
+            usuario.Email = dto.Email;
+
+        usuario.Perfil = dto.Perfil;
+        usuario.Ativo = dto.Ativo;
+
+        if (!string.IsNullOrWhiteSpace(dto.NovaSenha))
+            usuario.SenhaHash = BCrypt.Net.BCrypt.HashPassword(dto.NovaSenha);
+
+        return await _repo.AtualizarAsync(usuario);
+    }
+
+    public async Task ExcluirAsync(int id)
+    {
+        await _repo.ExcluirAsync(id);
     }
 
     public async Task<List<Usuario>> ListarAsync()

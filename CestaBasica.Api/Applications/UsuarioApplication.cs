@@ -27,4 +27,14 @@ public class UsuarioApplication
     {
         return await _service.LoginAsync(dto);
     }
+
+    public async Task<Usuario> AtualizarAsync(int id, UsuarioUpdateDto dto)
+    {
+        return await _service.AtualizarAsync(id, dto);
+    }
+
+    public async Task ExcluirAsync(int id)
+    {
+        await _service.ExcluirAsync(id);
+    }
 }

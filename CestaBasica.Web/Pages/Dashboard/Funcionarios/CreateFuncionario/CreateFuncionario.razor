@@ -18,6 +18,13 @@
         </button>
     </div>
 
+    @if (!string.IsNullOrWhiteSpace(mensagemSucesso))
+    {
+        <div class="alert alert-success mb-3">
+            ✅ @mensagemSucesso
+        </div>
+    }
+
     <EditForm Model="funcionario" OnValidSubmit="Salvar" FormName="funcionarioForm">
 
         <DataAnnotationsValidator />

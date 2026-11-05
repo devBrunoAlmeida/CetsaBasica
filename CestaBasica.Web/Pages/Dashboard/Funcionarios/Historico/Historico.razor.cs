@@ -30,6 +30,8 @@ public partial class Historico : ComponentBase
 
             HistoricoFuncionario = await Http.GetFromJsonAsync<HistoricoFuncionarioDto>(
                 $"api/funcionarios/{Id}/historico");
+
+            Eventos = HistoricoFuncionario?.Eventos ?? new();
         }
         catch
         {

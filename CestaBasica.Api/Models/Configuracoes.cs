@@ -17,4 +17,9 @@ public class Configuracoes
     public bool PermitirCadastroOperadores { get; set; }
 
     public bool BloqueioTentativasInvalidas { get; set; }
+
+    public string EvolutionBaseUrl { get; set; } = "http://localhost:8080";
+    public string EvolutionApiKey { get; set; } = string.Empty;
+    public string EvolutionInstance { get; set; } = "cesta-basica";
+    public string EvolutionTelefone { get; set; } = string.Empty;
 }

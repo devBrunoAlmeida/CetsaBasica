@@ -11,10 +11,12 @@ builder.Services.AddRazorComponents()
 builder.Services.AddScoped<UsuarioApiService>();
 builder.Services.AddScoped<SessaoUsuarioService>();
 
+var apiBaseUrl = builder.Configuration["ApiBaseUrl"] ?? "http://localhost:5237/";
+
 builder.Services.AddScoped(sp =>
     new HttpClient
     {
-        BaseAddress = new Uri("http://localhost:5237/")
+        BaseAddress = new Uri(apiBaseUrl)
     });
 
 var app = builder.Build();
@@ -23,9 +25,8 @@ if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
     app.UseHsts();
+    app.UseHttpsRedirection();
 }
-
-app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 

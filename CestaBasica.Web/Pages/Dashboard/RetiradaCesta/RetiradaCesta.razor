@@ -61,7 +61,7 @@
             {
                 <div class="employee-info">
                     <div class="avatar">
-                        @funcionarioSelecionado.NomeCompleto[..1]
+                        @(!string.IsNullOrWhiteSpace(funcionarioSelecionado.NomeCompleto) ? funcionarioSelecionado.NomeCompleto[..1] : "?")
                     </div>
 
                     <div>
@@ -120,6 +120,13 @@
         </div>
     }
 
+    @if (!string.IsNullOrWhiteSpace(erroRetirada))
+    {
+        <div class="alert alert-danger mt-3">
+            ⚠️ @erroRetirada
+        </div>
+    }
+
     <section class="history-panel">
         <div class="panel-header">
             <h2>Histórico recente de retiradas</h2>
@@ -155,7 +162,7 @@
                     else
                     {
                         <tr>
-                            <td colspan="4" class="empty-table">
+                            <td colspan="5" class="empty-table">
                                 Nenhuma retirada recente encontrada.
                             </td>
                         </tr>

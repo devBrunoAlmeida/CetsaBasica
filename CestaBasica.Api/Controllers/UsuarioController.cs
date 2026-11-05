@@ -73,4 +73,39 @@ public class UsuariosController : ControllerBase
             return BadRequest(new { mensagem = ex.Message });
         }
     }
+
+    [HttpPut("{id:int}")]
+    public async Task<IActionResult> Atualizar(int id, UsuarioUpdateDto dto)
+    {
+        try
+        {
+            var result = await _app.AtualizarAsync(id, dto);
+            return Ok(new
+            {
+                result.Id,
+                result.Nome,
+                result.Email,
+                Perfil = result.Perfil.ToString(),
+                result.Ativo
+            });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { mensagem = ex.Message });
+        }
+    }
+
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> Excluir(int id)
+    {
+        try
+        {
+            await _app.ExcluirAsync(id);
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { mensagem = ex.Message });
+        }
+    }
 }

@@ -3,6 +3,9 @@ using CestaBasica.Api.Repositories;
 using CestaBasica.Api.Services;
 using CestaBasica.Api.Applications;
 using Microsoft.EntityFrameworkCore;
+using OfficeOpenXml;
+
+ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,14 +19,6 @@ builder.Services.AddSwaggerGen();
 
 #region Configurações de banco
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-
-Console.WriteLine("CONNECTION STRING:");
-Console.WriteLine(connectionString);
-Console.WriteLine("EVOLUTION CONFIG:");
-Console.WriteLine(builder.Configuration["EvolutionApi:BaseUrl"]);
-Console.WriteLine(builder.Configuration["EvolutionApi:ApiKey"]);
-Console.WriteLine(builder.Configuration["EvolutionApi:Instance"]);
-
 
 if (string.IsNullOrWhiteSpace(connectionString))
     throw new Exception("ConnectionString DefaultConnection não configurada.");

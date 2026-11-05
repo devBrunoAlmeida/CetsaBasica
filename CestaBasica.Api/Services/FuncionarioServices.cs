@@ -10,16 +10,19 @@ public class FuncionarioService
     private readonly FuncionarioRepository _funcionarioRepository;
     private readonly RetiradaRepository _retiradaRepository;
     private readonly CestaRepository _cestaRepository;
+    private readonly NotificacaoRepository _notificacaoRepository;
 
     public FuncionarioService(
         FuncionarioRepository funcionarioRepository,
         RetiradaRepository retiradaRepository,
-        CestaRepository cestaRepository
+        CestaRepository cestaRepository,
+        NotificacaoRepository notificacaoRepository
         )
     {
         _cestaRepository = cestaRepository;
         _funcionarioRepository = funcionarioRepository;
         _retiradaRepository = retiradaRepository;
+        _notificacaoRepository = notificacaoRepository;
     }
 
     public async Task<FuncionarioDto> CriarAsync(FuncionarioDto dto)
@@ -31,6 +34,8 @@ public class FuncionarioService
             CodigoBarras = dto.CodigoBarras,
             Telefone = dto.Telefone,
             Setor = dto.Setor,
+            Status = "Pendente",
+            CriadoEm = DateTime.UtcNow
         };
 
         var criado = await _funcionarioRepository.CriarAsync(funcionario);
@@ -43,33 +48,48 @@ public class FuncionarioService
             CodigoBarras = criado.CodigoBarras,
             Telefone = criado.Telefone,
             Setor = criado.Setor,
-            Status = "Pendente"
+            Status = "Pendente",
+            DataRetirada = criado.DataRetirada,
+            CriadoEm = criado.CriadoEm
         };
+    }
+
+    private async Task<(bool TemLoteAtivo, HashSet<int> FuncionariosComRetirada)> ObterMapaStatusAtivoAsync()
+    {
+        var cestasAtivas = await _cestaRepository.ListarAtivasAsync();
+        if (cestasAtivas.Count == 0)
+            return (false, new HashSet<int>());
+
+        var cestaIds = cestasAtivas.Select(c => c.Id).ToList();
+        var retiraram = await _retiradaRepository.ListarFuncionariosComRetiradaEmCestasAsync(cestaIds);
+        return (true, retiraram);
+    }
+
+    private static string ResolverStatus(int funcionarioId, bool temLoteAtivo, HashSet<int> funcionariosComRetirada)
+    {
+        if (!temLoteAtivo)
+            return "Sem lote ativo";
+
+        return funcionariosComRetirada.Contains(funcionarioId) ? "Retirado" : "Pendente";
     }
 
     public async Task<List<FuncionarioDto>> ListarAsync()
     {
         var funcionarios = await _funcionarioRepository.ListarAsync();
+        var (temLoteAtivo, retiraram) = await ObterMapaStatusAtivoAsync();
 
-        var lista = new List<FuncionarioDto>();
-
-        foreach (var funcionario in funcionarios)
+        return funcionarios.Select(funcionario => new FuncionarioDto
         {
-            var historico = await ObterHistoricoAsync(funcionario.Id);
-
-            lista.Add(new FuncionarioDto
-            {
-                Id = funcionario.Id,
-                NomeCompleto = funcionario.NomeCompleto,
-                Matricula = funcionario.Matricula,
-                CodigoBarras = funcionario.CodigoBarras,
-                Telefone = funcionario.Telefone,
-                Setor = funcionario.Setor,
-                Status = historico.Status
-            });
-        }
-
-        return lista;
+            Id = funcionario.Id,
+            NomeCompleto = funcionario.NomeCompleto,
+            Matricula = funcionario.Matricula,
+            CodigoBarras = funcionario.CodigoBarras,
+            Telefone = funcionario.Telefone,
+            Setor = funcionario.Setor,
+            Status = ResolverStatus(funcionario.Id, temLoteAtivo, retiraram),
+            DataRetirada = funcionario.DataRetirada,
+            CriadoEm = funcionario.CriadoEm
+        }).ToList();
     }
 
     public async Task ExcluirAsync(int id)
@@ -95,41 +115,85 @@ public class FuncionarioService
 
     public async Task<HistoricoFuncionarioDto> ObterHistoricoAsync(int funcionarioId)
     {
+        var funcionario = await _funcionarioRepository.BuscarPorIdAsync(funcionarioId);
         var cestasAtivas = await _cestaRepository.ListarAtivasAsync();
+        var retiradas = await _retiradaRepository.ListarPorFuncionarioAsync(funcionarioId);
+        var notificacoes = await _notificacaoRepository.ListarPorFuncionarioAsync(funcionarioId);
+
+        var eventos = new List<EventoHistoricoDto>();
+
+        if (funcionario is not null)
+        {
+            eventos.Add(new EventoHistoricoDto
+            {
+                DataHora = funcionario.CriadoEm,
+                Tipo = "CADASTRO",
+                Titulo = "Cadastro no Sistema",
+                Descricao = $"Funcionário vinculado à {funcionario.Setor} (Matrícula {funcionario.Matricula}).",
+                Responsavel = "Sistema"
+            });
+        }
+
+        foreach (var r in retiradas)
+        {
+            eventos.Add(new EventoHistoricoDto
+            {
+                DataHora = r.DataRetirada,
+                Tipo = "RETIRADA",
+                Titulo = "Retirado",
+                Descricao = $"Entrega realizada — Lote: {r.Cesta?.Nome ?? $"#{r.CestaId}"}",
+                Responsavel = r.Cesta?.Nome ?? "Atendimento"
+            });
+        }
+
+        foreach (var n in notificacoes)
+        {
+            eventos.Add(new EventoHistoricoDto
+            {
+                DataHora = n.DataEnvio ?? DateTime.UtcNow,
+                Tipo = "NOTIFICACAO",
+                Titulo = n.Status,
+                Descricao = $"{n.Canal} ({n.Telefone}): {n.Mensagem}",
+                Responsavel = n.Canal
+            });
+        }
+
+        eventos = eventos.OrderByDescending(e => e.DataHora).ToList();
+
+        var ultimaRetirada = retiradas.FirstOrDefault()?.DataRetirada;
 
         if (!cestasAtivas.Any())
         {
             return new HistoricoFuncionarioDto
             {
                 Status = "Sem lote ativo",
-                LotesAtivos = "-"
+                LotesAtivos = "-",
+                UltimaRetirada = ultimaRetirada,
+                Eventos = eventos
             };
         }
 
-        var statusList = new List<string>();
-        var lotesList = new List<string>();
-
-        foreach (var cesta in cestasAtivas)
-        {
-            var retirada = await _retiradaRepository
-                .BuscarPorFuncionarioECestaAsync(funcionarioId, cesta.Id);
-
-            statusList.Add(retirada is null ? "Pendente" : "Retirado");
-            lotesList.Add(cesta.Nome);
-        }
+        var idsCestasAtivas = cestasAtivas.Select(c => c.Id).ToHashSet();
+        var retirouLoteAtivo = retiradas.Any(r => idsCestasAtivas.Contains(r.CestaId));
 
         return new HistoricoFuncionarioDto
         {
-            Status = string.Join(", ", statusList),
-            LotesAtivos = string.Join(", ", lotesList)
+            Status = retirouLoteAtivo ? "Retirado" : "Pendente",
+            LotesAtivos = string.Join(", ", cestasAtivas.Select(c => c.Nome)),
+            UltimaRetirada = ultimaRetirada,
+            ProximaRetirada = ultimaRetirada?.AddMonths(1),
+            Eventos = eventos
         };
     }
+
     public async Task<FuncionarioDto?> BuscarPorCodigoAsync(string codigoBarras)
     {
         var funcionario = await _funcionarioRepository.BuscarPorCodigoBarrasAsync(codigoBarras);
 
         if (funcionario is null)
             return null;
+
+        var (temLoteAtivo, retiraram) = await ObterMapaStatusAtivoAsync();
 
         return new FuncionarioDto
         {
@@ -139,12 +203,16 @@ public class FuncionarioService
             CodigoBarras = funcionario.CodigoBarras,
             Telefone = funcionario.Telefone,
             Setor = funcionario.Setor,
-            Status = funcionario.Status
+            Status = ResolverStatus(funcionario.Id, temLoteAtivo, retiraram),
+            DataRetirada = funcionario.DataRetirada,
+            CriadoEm = funcionario.CriadoEm
         };
     }
+
     public async Task<List<FuncionarioDto>> BuscarManualAsync(string termo)
     {
         var funcionarios = await _funcionarioRepository.BuscaManualAsync(termo);
+        var (temLoteAtivo, retiraram) = await ObterMapaStatusAtivoAsync();
 
         return funcionarios.Select(f => new FuncionarioDto
         {
@@ -154,9 +222,12 @@ public class FuncionarioService
             CodigoBarras = f.CodigoBarras,
             Telefone = f.Telefone,
             Setor = f.Setor,
-            Status = f.Status
+            Status = ResolverStatus(f.Id, temLoteAtivo, retiraram),
+            DataRetirada = f.DataRetirada,
+            CriadoEm = f.CriadoEm
         }).ToList();
     }
+
     public async Task<FuncionarioDto?> BuscarPorIdAsync(int id)
     {
         var funcionario = await _funcionarioRepository.BuscarPorIdAsync(id);
@@ -164,7 +235,7 @@ public class FuncionarioService
         if (funcionario is null)
             return null;
 
-        var historico = await ObterHistoricoAsync(funcionario.Id);
+        var (temLoteAtivo, retiraram) = await ObterMapaStatusAtivoAsync();
 
         return new FuncionarioDto
         {
@@ -174,12 +245,16 @@ public class FuncionarioService
             CodigoBarras = funcionario.CodigoBarras,
             Telefone = funcionario.Telefone,
             Setor = funcionario.Setor,
-            Status = historico.Status
+            Status = ResolverStatus(funcionario.Id, temLoteAtivo, retiraram),
+            DataRetirada = funcionario.DataRetirada,
+            CriadoEm = funcionario.CriadoEm
         };
     }
+
     public async Task<byte[]> ExportarExcelAsync()
     {
-        var funcionarios = await _funcionarioRepository.ListarAsync();
+        ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+        var funcionarios = await ListarAsync();
 
         using var package = new ExcelPackage();
         var sheet = package.Workbook.Worksheets.Add("Funcionários");
@@ -209,6 +284,7 @@ public class FuncionarioService
 
         return package.GetAsByteArray();
     }
+
     public async Task<List<string>> ListarSetoresAsync()
     {
         return await _funcionarioRepository.ListarSetoresAsync();

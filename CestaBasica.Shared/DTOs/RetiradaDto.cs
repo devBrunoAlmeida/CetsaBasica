@@ -1,3 +1,5 @@
+namespace CestaBasica.Shared.DTOs;
+
 public class RetiradaCestaDto
 {
     public int Id { get; set; }

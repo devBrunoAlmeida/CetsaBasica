@@ -68,4 +68,28 @@ public class NotificacaoService
     {
         return await _notificacaoRepository.ListarAsync();
     }
+
+    public Task<WhatsappStatusDto> ObterStatusWhatsappAsync()
+        => _evolutionApiService.ObterStatusAsync();
+
+    public Task<WhatsappStatusDto> ConfigurarWhatsappAsync(WhatsappConfigDto dto)
+        => _evolutionApiService.SalvarConfiguracaoAsync(dto);
+
+    public Task<WhatsappConexaoResultadoDto> ConectarWhatsappAsync(WhatsappConectarRequestDto dto)
+        => _evolutionApiService.ConectarAsync(dto);
+
+    public Task<WhatsappStatusDto> DesconectarWhatsappAsync()
+        => _evolutionApiService.DesconectarAsync();
+
+    public async Task<string> EnviarTesteWhatsappAsync(WhatsappTesteEnvioDto dto)
+    {
+        if (string.IsNullOrWhiteSpace(dto.Telefone))
+            throw new Exception("Informe um número de telefone com DDD para enviar o teste.");
+
+        var texto = string.IsNullOrWhiteSpace(dto.Mensagem)
+            ? "✅ Olá! Teste de conexão realizado com sucesso pelo Sistema de Gestão de Cestas Básicas."
+            : dto.Mensagem;
+
+        return await _evolutionApiService.EnviarTextoAsync(dto.Telefone, texto);
+    }
 }

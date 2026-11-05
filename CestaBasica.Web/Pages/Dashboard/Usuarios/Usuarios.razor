@@ -1,6 +1,9 @@
 @page "/usuarios"
+@using System.Net.Http.Json
+@using CestaBasica.Shared.DTOs
+@using CestaBasica.Shared.Enums
 @using Microsoft.AspNetCore.Components.Routing
-
+@inject HttpClient Http
 
 <div class="users-page">
 
@@ -9,15 +12,21 @@
             <div>
                 <h1>Administração de Usuários</h1>
                 <p>
-                  Gerencie acessos, perfis e permissões dos usuários do sistema.
+                    Gerencie acessos, perfis e permissões dos usuários do sistema.
                 </p>
             </div>
-
         </div>
-        <a href="/novo" class="btn-primary" >
+        <button type="button" class="btn-primary" @onclick="AbrirCadastro">
             + Novo usuário
-        </a>
+        </button>
     </div>
+
+    @if (!string.IsNullOrWhiteSpace(mensagemFeedback))
+    {
+        <div class="alert @(erroFeedback ? "alert-danger" : "alert-success") mb-3">
+            @mensagemFeedback
+        </div>
+    }
 
     <section class="filters-card">
         <div class="search-box">
@@ -50,10 +59,15 @@
                 </div>
 
                 <div class="form-group">
+                    <label>@(editando ? "Nova senha (opcional)" : "Senha")</label>
+                    <input type="password" @bind="usuarioForm.Senha" placeholder="@(editando ? "Deixe em branco para manter" : "Digite a senha")" />
+                </div>
+
+                <div class="form-group">
                     <label>Perfil</label>
                     <select @bind="usuarioForm.Perfil">
-                        <option>Administrador</option>
-                        <option>Operador</option>
+                        <option value="Admin">Administrador</option>
+                        <option value="Usuario">Operador / Usuário</option>
                     </select>
                 </div>
 
@@ -118,8 +132,8 @@
                             <td>@usuario.Email</td>
 
                             <td>
-                                <span class="profile-badge @(usuario.Perfil == "Administrador" ? "admin" : "operator")">
-                                    @usuario.Perfil
+                                <span class="profile-badge @(usuario.Perfil == "Admin" ? "admin" : "operator")">
+                                    @(usuario.Perfil == "Admin" ? "Administrador" : "Operador")
                                 </span>
                             </td>
 
@@ -157,42 +171,40 @@
     private string busca = "";
     private bool exibirFormulario = false;
     private bool editando = false;
+    private string? mensagemFeedback;
+    private bool erroFeedback = false;
 
     private UsuarioViewModel usuarioForm = new();
+    private List<UsuarioViewModel> usuarios = new();
 
-    private List<UsuarioViewModel> usuarios = new()
+    protected override async Task OnInitializedAsync()
     {
-        new()
+        await CarregarUsuarios();
+    }
+
+    private async Task CarregarUsuarios()
+    {
+        try
         {
-            Id = 1,
-            Nome = "Administrador Geral",
-            Email = "admin@empresa.com.br",
-            Perfil = "Administrador",
-            Ativo = true,
-            Permissoes = new PermissoesUsuario
+            var lista = await Http.GetFromJsonAsync<List<UsuarioListItemDto>>("api/usuarios/listar") ?? new();
+            usuarios = lista.Select(u => new UsuarioViewModel
             {
-                Funcionarios = true,
-                Retiradas = true,
-                Notificacoes = true,
-                Relatorios = true,
-                Usuarios = true
-            }
-        },
-        new()
-        {
-            Id = 2,
-            Nome = "Operador Atendimento",
-            Email = "operador@empresa.com.br",
-            Perfil = "Operador",
-            Ativo = true,
-            Permissoes = new PermissoesUsuario
-            {
-                Funcionarios = true,
-                Retiradas = true,
-                Notificacoes = true
-            }
+                Id = u.Id,
+                Nome = u.Nome,
+                Email = u.Email,
+                Perfil = u.Perfil,
+                Ativo = u.Ativo,
+                Permissoes = u.Perfil == "Admin"
+                    ? PermissoesUsuario.AdminPadrao()
+                    : PermissoesUsuario.OperadorPadrao()
+            }).ToList();
         }
-    };
+        catch (Exception ex)
+        {
+            erroFeedback = true;
+            mensagemFeedback = $"Erro ao carregar usuários: {ex.Message}";
+        }
+    }
 
     private IEnumerable<UsuarioViewModel> UsuariosFiltrados =>
         usuarios.Where(u =>
@@ -205,11 +217,12 @@
     private void AbrirCadastro()
     {
         editando = false;
+        mensagemFeedback = null;
         usuarioForm = new UsuarioViewModel
         {
-            Perfil = "Operador",
+            Perfil = "Usuario",
             Ativo = true,
-            Permissoes = new PermissoesUsuario()
+            Permissoes = PermissoesUsuario.OperadorPadrao()
         };
 
         exibirFormulario = true;
@@ -218,6 +231,7 @@
     private void EditarUsuario(UsuarioViewModel usuario)
     {
         editando = true;
+        mensagemFeedback = null;
 
         usuarioForm = new UsuarioViewModel
         {
@@ -232,36 +246,68 @@
         exibirFormulario = true;
     }
 
-    private void SalvarUsuario()
+    private async Task SalvarUsuario()
     {
+        mensagemFeedback = null;
+        erroFeedback = false;
+
+        var perfilEnum = usuarioForm.Perfil == "Admin" ? PerfilUsuario.Admin : PerfilUsuario.Usuario;
+
+        HttpResponseMessage response;
         if (editando)
         {
-            var usuario = usuarios.FirstOrDefault(x => x.Id == usuarioForm.Id);
-
-            if (usuario is not null)
+            var dto = new UsuarioUpdateDto
             {
-                usuario.Nome = usuarioForm.Nome;
-                usuario.Email = usuarioForm.Email;
-                usuario.Perfil = usuarioForm.Perfil;
-                usuario.Ativo = usuarioForm.Ativo;
-                usuario.Permissoes = usuarioForm.Permissoes;
-            }
+                Id = usuarioForm.Id,
+                Nome = usuarioForm.Nome,
+                Email = usuarioForm.Email,
+                NovaSenha = string.IsNullOrWhiteSpace(usuarioForm.Senha) ? null : usuarioForm.Senha,
+                Perfil = perfilEnum,
+                Ativo = usuarioForm.Ativo
+            };
+            response = await Http.PutAsJsonAsync($"api/usuarios/{usuarioForm.Id}", dto);
         }
         else
         {
-            usuarioForm.Id = usuarios.Max(x => x.Id) + 1;
-            usuarios.Add(usuarioForm);
+            var dto = new UsuarioCreateDto
+            {
+                Nome = usuarioForm.Nome,
+                Email = usuarioForm.Email,
+                Senha = usuarioForm.Senha,
+                Perfil = perfilEnum,
+                Ativo = usuarioForm.Ativo
+            };
+            response = await Http.PostAsJsonAsync("api/usuarios/criar", dto);
+        }
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var erro = await response.Content.ReadFromJsonAsync<ErroApiDto>();
+            erroFeedback = true;
+            mensagemFeedback = erro?.Mensagem ?? "Erro ao salvar usuário.";
+            return;
         }
 
         exibirFormulario = false;
+        mensagemFeedback = editando ? "Usuário atualizado com sucesso." : "Usuário cadastrado com sucesso.";
+        await CarregarUsuarios();
     }
 
-    private void ExcluirUsuario(int id)
+    private async Task ExcluirUsuario(int id)
     {
-        var usuario = usuarios.FirstOrDefault(x => x.Id == id);
-
-        if (usuario is not null)
-            usuarios.Remove(usuario);
+        mensagemFeedback = null;
+        var response = await Http.DeleteAsync($"api/usuarios/{id}");
+        if (response.IsSuccessStatusCode)
+        {
+            erroFeedback = false;
+            mensagemFeedback = "Usuário excluído com sucesso.";
+            await CarregarUsuarios();
+        }
+        else
+        {
+            erroFeedback = true;
+            mensagemFeedback = "Não foi possível excluir o usuário.";
+        }
     }
 
     private void Cancelar()
@@ -274,7 +320,8 @@
         public int Id { get; set; }
         public string Nome { get; set; } = "";
         public string Email { get; set; } = "";
-        public string Perfil { get; set; } = "Operador";
+        public string Senha { get; set; } = "";
+        public string Perfil { get; set; } = "Usuario";
         public bool Ativo { get; set; } = true;
         public PermissoesUsuario Permissoes { get; set; } = new();
     }
@@ -286,6 +333,22 @@
         public bool Notificacoes { get; set; }
         public bool Relatorios { get; set; }
         public bool Usuarios { get; set; }
+
+        public static PermissoesUsuario AdminPadrao() => new()
+        {
+            Funcionarios = true,
+            Retiradas = true,
+            Notificacoes = true,
+            Relatorios = true,
+            Usuarios = true
+        };
+
+        public static PermissoesUsuario OperadorPadrao() => new()
+        {
+            Funcionarios = true,
+            Retiradas = true,
+            Notificacoes = true
+        };
 
         public List<string> ListarAtivas()
         {

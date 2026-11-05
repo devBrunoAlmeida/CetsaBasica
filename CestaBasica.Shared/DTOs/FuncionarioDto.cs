@@ -21,6 +21,10 @@ public class FuncionarioDto
     public string Setor { get; set; } = string.Empty;
 
     public string Status { get; set; } = string.Empty;
+
+    public DateTime? DataRetirada { get; set; }
+
+    public DateTime CriadoEm { get; set; }
 }
 public class HistoricoFuncionarioDto
 {
@@ -28,6 +32,7 @@ public class HistoricoFuncionarioDto
     public string LotesAtivos { get; set; } = string.Empty;
     public DateTime? UltimaRetirada { get; set; }
     public DateTime? ProximaRetirada { get; set; }
+    public List<EventoHistoricoDto> Eventos { get; set; } = new();
 }
 public class EventoHistoricoDto
 {

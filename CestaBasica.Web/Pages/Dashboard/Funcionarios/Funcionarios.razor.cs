@@ -4,19 +4,17 @@ using CestaBasica.Shared.DTOs;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 
-
-
 namespace CestaBasica.Web.Pages.Dashboard.Funcionarios;
 
 public partial class Funcionarios : ComponentBase
 {
-    [Inject] 
+    [Inject]
     private IJSRuntime JS { get; set; } = default!;
     [Inject]
     private HttpClient Http { get; set; } = default!;
     [Inject]
-
     private NavigationManager Navigation { get; set; } = default!;
+
     protected List<FuncionarioDto> funcionarios = [];
     protected int? EditarFuncionarioId;
     protected int TotalFuncionarios => FuncionariosFiltrados.Count();
@@ -29,11 +27,11 @@ public partial class Funcionarios : ComponentBase
     protected int ItensPorPagina = 20;
     protected List<string> setores = [];
 
-
     protected void ResetarPagina()
     {
         PaginaAtual = 1;
     }
+
     protected void FiltrarDataInicial(ChangeEventArgs e)
     {
         if (DateTime.TryParse(e.Value?.ToString(), out var data))
@@ -43,6 +41,7 @@ public partial class Funcionarios : ComponentBase
 
         ResetarPagina();
     }
+
     protected void FiltrarDataFinal(ChangeEventArgs e)
     {
         if (DateTime.TryParse(e.Value?.ToString(), out var data))
@@ -52,11 +51,11 @@ public partial class Funcionarios : ComponentBase
 
         ResetarPagina();
     }
+
     protected override async Task OnInitializedAsync()
     {
         funcionarios =
-            await Http.GetFromJsonAsync<List<FuncionarioDto>>
-            ("api/funcionarios")
+            await Http.GetFromJsonAsync<List<FuncionarioDto>>("api/funcionarios")
             ?? [];
 
         setores = funcionarios
@@ -66,6 +65,7 @@ public partial class Funcionarios : ComponentBase
             .OrderBy(s => s)
             .ToList();
     }
+
     private async Task SalvarFuncionario(FuncionarioDto funcionario)
     {
         var response = await Http.PutAsJsonAsync(
@@ -74,71 +74,89 @@ public partial class Funcionarios : ComponentBase
 
         if (response.IsSuccessStatusCode)
         {
-            funcionarios = await Http.GetFromJsonAsync<List<FuncionarioDto>>
-                ("api/funcionarios")
+            funcionarios = await Http.GetFromJsonAsync<List<FuncionarioDto>>("api/funcionarios")
                 ?? [];
 
             EditarFuncionarioId = null;
         }
     }
+
     private void CancelarEdicao()
     {
         EditarFuncionarioId = null;
     }
+
     private async Task ExcluirFuncionario(int id)
     {
-        var response =
-            await Http.DeleteAsync($"api/funcionarios/{id}");
+        var response = await Http.DeleteAsync($"api/funcionarios/{id}");
 
         if (response.IsSuccessStatusCode)
         {
             funcionarios.RemoveAll(x => x.Id == id);
         }
     }
+
     protected IEnumerable<FuncionarioDto> FuncionariosFiltrados =>
-     funcionarios.Where(f =>
-     {
-         var buscaOk = string.IsNullOrWhiteSpace(termoBusca)
-             || f.NomeCompleto.Contains(termoBusca, StringComparison.OrdinalIgnoreCase)
-             || f.Matricula.Contains(termoBusca, StringComparison.OrdinalIgnoreCase)
-             || f.CodigoBarras.Contains(termoBusca, StringComparison.OrdinalIgnoreCase);
+        funcionarios.Where(f =>
+        {
+            var buscaOk = string.IsNullOrWhiteSpace(termoBusca)
+                || f.NomeCompleto.Contains(termoBusca, StringComparison.OrdinalIgnoreCase)
+                || f.Matricula.Contains(termoBusca, StringComparison.OrdinalIgnoreCase)
+                || f.CodigoBarras.Contains(termoBusca, StringComparison.OrdinalIgnoreCase);
 
-         var statusOk = string.IsNullOrWhiteSpace(filtroStatus)
-             || f.Status == filtroStatus;
+            var statusOk = string.IsNullOrWhiteSpace(filtroStatus)
+                || f.Status == filtroStatus;
 
-         var setorOk = string.IsNullOrWhiteSpace(filtroSetor)
-             || f.Setor == filtroSetor;
+            var setorOk = string.IsNullOrWhiteSpace(filtroSetor)
+                || f.Setor == filtroSetor;
 
-         return buscaOk && statusOk && setorOk;
-     });
+            var dataRef = (f.DataRetirada ?? f.CriadoEm).Date;
+            var dataIniOk = !dataInicial.HasValue || dataRef >= dataInicial.Value.Date;
+            var dataFimOk = !dataFinal.HasValue || dataRef <= dataFinal.Value.Date;
 
-
+            return buscaOk && statusOk && setorOk && dataIniOk && dataFimOk;
+        });
 
     private void VisualizarHistorico(FuncionarioDto funcionario)
     {
         Navigation.NavigateTo($"/funcionarios/{funcionario.Id}/historico");
     }
+
     protected int TotalPaginas =>
-        (int)Math.Ceiling((double)TotalFuncionarios / ItensPorPagina);
+        Math.Max(1, (int)Math.Ceiling((double)TotalFuncionarios / ItensPorPagina));
+
+    protected IEnumerable<int> PaginasVisiveis
+    {
+        get
+        {
+            var inicio = Math.Max(1, PaginaAtual - 3);
+            var fim = Math.Min(TotalPaginas, PaginaAtual + 3);
+            return Enumerable.Range(inicio, fim - inicio + 1);
+        }
+    }
 
     protected IEnumerable<FuncionarioDto> FuncionariosPaginados =>
         FuncionariosFiltrados
             .Skip((PaginaAtual - 1) * ItensPorPagina)
             .Take(ItensPorPagina);
+
     protected void PaginaAnterior()
     {
         if (PaginaAtual > 1)
             PaginaAtual--;
     }
+
     protected void ProximaPagina()
     {
         if (PaginaAtual < TotalPaginas)
             PaginaAtual++;
     }
+
     protected void IrParaPagina(int pagina)
     {
         PaginaAtual = pagina;
     }
+
     private async Task ExportarExcel()
     {
         var bytes = await Http.GetByteArrayAsync("api/funcionarios/exportar-excel");

@@ -69,6 +69,22 @@ namespace CestaBasica.Api.Migrations
                     b.Property<bool>("EnvioAutomaticoLembretes")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("EvolutionApiKey")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("EvolutionBaseUrl")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("EvolutionInstance")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("EvolutionTelefone")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("FrequenciaBackup")
                         .IsRequired()
                         .HasColumnType("text");

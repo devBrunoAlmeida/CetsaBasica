@@ -1,4 +1,5 @@
 using System.Net.Http.Json;
+using CestaBasica.Shared.DTOs;
 using CestaBasica.Web.Models.Requests;
 using CestaBasica.Web.Models.Responses;
 
@@ -13,7 +14,7 @@ public class UsuarioApiService
         _http = http;
     }
 
-    public async Task<LoginResponse?> LoginAsync(LoginRequest request)
+    public async Task<(LoginResponse? Usuario, string? Erro)> LoginComDetalheAsync(LoginRequest request)
     {
         var response = await _http.PostAsJsonAsync(
             "api/usuarios/login",
@@ -21,9 +22,25 @@ public class UsuarioApiService
         );
 
         if (!response.IsSuccessStatusCode)
-            return null;
+        {
+            try
+            {
+                var erro = await response.Content.ReadFromJsonAsync<ErroApiDto>();
+                return (null, erro?.Mensagem ?? "Usuário ou senha inválidos.");
+            }
+            catch
+            {
+                return (null, "Usuário ou senha inválidos.");
+            }
+        }
 
-        return await response.Content
-            .ReadFromJsonAsync<LoginResponse>();
+        var loginResponse = await response.Content.ReadFromJsonAsync<LoginResponse>();
+        return (loginResponse, null);
+    }
+
+    public async Task<LoginResponse?> LoginAsync(LoginRequest request)
+    {
+        var (usuario, _) = await LoginComDetalheAsync(request);
+        return usuario;
     }
 }

@@ -31,7 +31,8 @@ public class RetiradaService
         if (funcionario == null)
             throw new Exception("Funcionário não encontrado.");
 
-        var cesta = await _cestaRepository.ObterPorIdAsync(dto.Id);
+        var cestaId = dto.LoteCestaId > 0 ? dto.LoteCestaId : dto.Id;
+        var cesta = await _cestaRepository.ObterPorIdAsync(cestaId);
 
         if (cesta == null)
             throw new Exception("Cesta não encontrada.");
@@ -47,16 +48,21 @@ public class RetiradaService
         if (jaRetirou)
             throw new Exception("Este funcionário já retirou esta cesta.");
 
+        var agora = DateTime.UtcNow;
+
         var retirada = new Retirada
         {
             FuncionarioId = funcionario.Id,
             CestaId = cesta.Id,
-            DataRetirada = DateTime.UtcNow
+            DataRetirada = agora
         };
 
         cesta.QuantidadeDisponivel--;
+        funcionario.Status = "Retirado";
+        funcionario.DataRetirada = agora;
 
         await _cestaRepository.AtualizarAsync(cesta);
+        await _funcionarioRepository.AtualizarAsync(funcionario);
         return await _retiradaRepository.CriarAsync(retirada);
     }
 

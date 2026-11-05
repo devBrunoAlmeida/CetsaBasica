@@ -43,6 +43,25 @@
                 <input type="checkbox" @bind="config.EnvioAutomaticoLembretes" />
                 Envio automático de lembretes
             </label>
+
+            <div class="form-group mt-3">
+                <label>URL da Evolution API</label>
+                <input class="form-control" @bind="config.EvolutionBaseUrl" placeholder="http://localhost:8080" />
+            </div>
+
+            <div class="form-group mt-2">
+                <label>API Key da Evolution API</label>
+                <input type="password" class="form-control" @bind="config.EvolutionApiKey" placeholder="Chave da Evolution API" />
+            </div>
+
+            <div class="form-group mt-2">
+                <label>Nome da Instância WhatsApp</label>
+                <input class="form-control" @bind="config.EvolutionInstance" placeholder="cesta-basica" />
+            </div>
+
+            <a href="/notificacoes" class="btn-secondary mt-3" style="display:inline-block;text-align:center;text-decoration:none;padding:10px 16px;border-radius:12px;">
+                📱 Conectar aparelho WhatsApp →
+            </a>
         </div>
 
         <div class="settings-card">

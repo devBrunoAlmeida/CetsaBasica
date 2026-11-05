@@ -56,19 +56,42 @@ public class RetiradaRepository
     }
 
     public async Task<List<RetiradaRecenteDto>> ListarRecentesDetalhadoAsync()
-{
-    return await _context.Retiradas
-        .Include(x => x.Funcionario)
-        .OrderByDescending(x => x.DataRetirada)
-        .Take(30)
-        .Select(x => new RetiradaRecenteDto
-        {
-            NomeCompleto = x.Funcionario.NomeCompleto,
-            Matricula = x.Funcionario.Matricula,
-            Setor = x.Funcionario.Setor,
-            Status = "Retirado",
-            DataRetirada = x.DataRetirada
-        })
-        .ToListAsync();
-}
+    {
+        return await _context.Retiradas
+            .Include(x => x.Funcionario)
+            .OrderByDescending(x => x.DataRetirada)
+            .Take(30)
+            .Select(x => new RetiradaRecenteDto
+            {
+                NomeCompleto = x.Funcionario.NomeCompleto,
+                Matricula = x.Funcionario.Matricula,
+                Setor = x.Funcionario.Setor,
+                Status = "Retirado",
+                DataRetirada = x.DataRetirada
+            })
+            .ToListAsync();
+    }
+
+    public async Task<HashSet<int>> ListarFuncionariosComRetiradaEmCestasAsync(List<int> cestaIds)
+    {
+        if (cestaIds.Count == 0)
+            return new HashSet<int>();
+
+        var ids = await _context.Retiradas
+            .Where(r => cestaIds.Contains(r.CestaId))
+            .Select(r => r.FuncionarioId)
+            .Distinct()
+            .ToListAsync();
+
+        return ids.ToHashSet();
+    }
+
+    public async Task<List<Retirada>> ListarPorFuncionarioAsync(int funcionarioId)
+    {
+        return await _context.Retiradas
+            .Include(r => r.Cesta)
+            .Where(r => r.FuncionarioId == funcionarioId)
+            .OrderByDescending(r => r.DataRetirada)
+            .ToListAsync();
+    }
 }

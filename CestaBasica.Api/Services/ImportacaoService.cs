@@ -47,6 +47,15 @@ public class ImportacaoService
         for (int row = 2; row <= totalLinhas; row++)
         {
             var registro = LerLinhaExcel(sheet, row);
+            if (registro.Valido)
+            {
+                var existente = await _funcionarioRepository.BuscarPorCodigoBarrasAsync(registro.CodigoBarras);
+                if (existente is not null)
+                {
+                    registro.Valido = false;
+                    registro.Erro = "Código de barras já cadastrado";
+                }
+            }
             resultado.Registros.Add(registro);
 
             if (registro.Valido)
@@ -83,8 +92,12 @@ public class ImportacaoService
 
         while ((linha = await reader.ReadLineAsync()) is not null)
         {
+            if (string.IsNullOrWhiteSpace(linha))
+                continue;
+
             row++;
-            var cols = linha.Split(';');
+            var separador = linha.Contains(';') ? ';' : ',';
+            var cols = linha.Split(separador);
 
             var reg = new RegistroImportacaoDto
             {
@@ -97,6 +110,16 @@ public class ImportacaoService
             };
 
             Validar(reg);
+            if (reg.Valido)
+            {
+                var existente = await _funcionarioRepository.BuscarPorCodigoBarrasAsync(reg.CodigoBarras);
+                if (existente is not null)
+                {
+                    reg.Valido = false;
+                    reg.Erro = "Código de barras já cadastrado";
+                }
+            }
+
             resultado.Registros.Add(reg);
 
             if (reg.Valido)

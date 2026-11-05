@@ -16,6 +16,7 @@ public partial class CreateFuncionario : ComponentBase
     protected List<string> setores = new();
     protected string setorSelecionado = string.Empty;
     protected string novoSetor = string.Empty;
+    protected string? mensagemSucesso;
 
     protected override async Task OnInitializedAsync()
     {
@@ -62,6 +63,7 @@ public partial class CreateFuncionario : ComponentBase
 
         if (response.IsSuccessStatusCode)
         {
+            mensagemSucesso = $"Funcionário {funcionario.NomeCompleto} cadastrado com sucesso!";
             funcionario = new FuncionarioDto
             {
                 Setor = string.Empty

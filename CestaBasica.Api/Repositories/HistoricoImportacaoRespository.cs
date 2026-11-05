@@ -3,6 +3,8 @@ using System.Linq;
 using CestaBasica.Api.Data;
 using CestaBasica.Api.Models;
 
+namespace CestaBasica.Api.Repositories;
+
 public class HistoricoImportacaoRepository
 {
     private readonly AppDbContext _context;

@@ -23,7 +23,9 @@ public class FuncionarioRepository
 
     public async Task<List<Funcionario>> ListarAsync()
     {
-        return await _context.Funcionarios.ToListAsync();
+        return await _context.Funcionarios
+            .OrderBy(f => f.NomeCompleto)
+            .ToListAsync();
     }
     public async Task<Funcionario?> BuscarPorCodigoBarrasAsync(string codigoBarras)
     {
